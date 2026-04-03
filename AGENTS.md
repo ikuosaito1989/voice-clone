@@ -1,5 +1,12 @@
 <!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# これはあなたの知っている Next.js ではない
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+このバージョンには破壊的変更があります。API、慣習、ファイル構成は、学習済みの知識と異なる可能性があります。コードを書く前に、`node_modules/next/dist/docs/` にある関連ガイドを読んでください。非推奨の警告も必ず確認してください。
+
+# Codex ルール
+
+- `useEffect` を使わないでください。
+- `useEffect` を使わない判断基準と代替手段は、https://ja.react.dev/learn/you-might-not-need-an-effect を参照してください。
+- 代わりに、レンダー時の導出、イベントハンドラ、`ref`、サーバ主導のパターンを優先してください。
+- 不要な `try/catch` は入れないでください。
 <!-- END:nextjs-agent-rules -->

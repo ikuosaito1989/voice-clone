@@ -1,12 +1,22 @@
 {
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "main": ".open-next/worker.js",
-  "name": "voice-clone",
-  // Set this to today's date
-  "compatibility_date": "2026-04-03",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS",
-  },
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "voice-clone",
+	// Set this to today's date
+	"compatibility_date": "2026-04-03",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS",
+	},
+	"d1_databases": [
+		{
+			"binding": "voice_clone",
+			"database_name": "voice-clone",
+			"database_id": "c73da22b-971e-4153-83b1-119f0eb8dff6",
+			"remote": true
+		}
+	],
 }

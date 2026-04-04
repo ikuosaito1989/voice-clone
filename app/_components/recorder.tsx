@@ -4,12 +4,15 @@ import { useRef, useState } from "react";
 import { convertBlobToWav } from "@/lib/audio/convert-blob-to-wav";
 
 type RecorderStatus = "idle" | "recording" | "stopped";
+type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
 
 export function Recorder() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const [status, setStatus] = useState<RecorderStatus>("idle");
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
+  const [uploadedKey, setUploadedKey] = useState<string | null>(null);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
 
@@ -23,6 +26,8 @@ export function Recorder() {
       URL.revokeObjectURL(recordedUrl);
     }
 
+    setUploadStatus("idle");
+    setUploadedKey(null);
     setRecordedBlob(null);
     setRecordedUrl(null);
   };
@@ -75,14 +80,35 @@ export function Recorder() {
     }
 
     const wavBlob = await convertBlobToWav(recordedBlob);
+    const fileName = `recording-${Date.now()}.wav`;
     const downloadUrl = URL.createObjectURL(wavBlob);
     const anchor = document.createElement("a");
 
     anchor.href = downloadUrl;
-    anchor.download = `recording-${Date.now()}.wav`;
+    anchor.download = fileName;
     anchor.click();
 
     URL.revokeObjectURL(downloadUrl);
+
+    const formData = new FormData();
+    formData.append("file", wavBlob, fileName);
+
+    setUploadStatus("uploading");
+    setUploadedKey(null);
+
+    const response = await fetch("/api/recordings", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      setUploadStatus("error");
+      return;
+    }
+
+    const data = (await response.json()) as { key: string };
+    setUploadedKey(data.key);
+    setUploadStatus("uploaded");
   };
 
   return (
@@ -112,15 +138,21 @@ export function Recorder() {
         <button
           type="button"
           onClick={handleSave}
-          disabled={recordedBlob === null}
+          disabled={recordedBlob === null || uploadStatus === "uploading"}
           className="rounded-lg border border-black/15 px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:text-black/30"
         >
-          保存
+          {uploadStatus === "uploading" ? "アップロード中..." : "保存してR2へアップロード"}
         </button>
       </div>
 
       {recordedUrl ? <audio controls src={recordedUrl} className="w-full" /> : null}
       <p className="text-sm text-black/60">状態: {status}</p>
+      {uploadStatus === "uploaded" ? (
+        <p className="text-sm text-emerald-700">R2 に保存しました: {uploadedKey}</p>
+      ) : null}
+      {uploadStatus === "error" ? (
+        <p className="text-sm text-red-700">R2 へのアップロードに失敗しました。</p>
+      ) : null}
     </section>
   );
 }

@@ -4,15 +4,30 @@ import { useRef, useState } from "react";
 import { convertBlobToWav } from "@/lib/audio/convert-blob-to-wav";
 
 type RecorderStatus = "idle" | "recording" | "stopped";
-type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
+type UploadMessageTone = "default" | "error";
 
-export function Recorder() {
+declare global {
+  interface Window {
+    turnstile?: {
+      reset: () => void;
+    };
+  }
+}
+
+type RecorderProps = {
+  turnstileSiteKey: string;
+};
+
+export function Recorder({ turnstileSiteKey }: RecorderProps) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const [status, setStatus] = useState<RecorderStatus>("idle");
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadedKey, setUploadedKey] = useState<string | null>(null);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
+  const [uploadMessageTone, setUploadMessageTone] =
+    useState<UploadMessageTone>("default");
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
 
@@ -21,13 +36,40 @@ export function Recorder() {
     streamRef.current = null;
   };
 
+  const clearUploadState = () => {
+    setIsUploading(false);
+    setUploadedKey(null);
+    setUploadMessage(null);
+    setUploadMessageTone("default");
+  };
+
+  const setUploadPending = () => {
+    setIsUploading(true);
+    setUploadedKey(null);
+    setUploadMessage(null);
+    setUploadMessageTone("default");
+  };
+
+  const setUploadError = (message: string) => {
+    setIsUploading(false);
+    setUploadedKey(null);
+    setUploadMessage(message);
+    setUploadMessageTone("error");
+  };
+
+  const setUploadSuccess = (key: string, message: string) => {
+    setIsUploading(false);
+    setUploadedKey(key);
+    setUploadMessage(message);
+    setUploadMessageTone("default");
+  };
+
   const resetRecording = () => {
     if (recordedUrl) {
       URL.revokeObjectURL(recordedUrl);
     }
 
-    setUploadStatus("idle");
-    setUploadedKey(null);
+    clearUploadState();
     setRecordedBlob(null);
     setRecordedUrl(null);
   };
@@ -79,6 +121,20 @@ export function Recorder() {
       return;
     }
 
+    if (!turnstileSiteKey) {
+      setUploadError("Turnstile site key が未設定です。");
+      return;
+    }
+
+    const turnstileToken = document.querySelector<HTMLInputElement>(
+      'input[name="cf-turnstile-response"]',
+    )?.value;
+
+    if (!turnstileToken) {
+      setUploadError("Turnstile の検証を完了してください。");
+      return;
+    }
+
     const wavBlob = await convertBlobToWav(recordedBlob);
     const fileName = `recording-${Date.now()}.wav`;
     const downloadUrl = URL.createObjectURL(wavBlob);
@@ -92,9 +148,9 @@ export function Recorder() {
 
     const formData = new FormData();
     formData.append("file", wavBlob, fileName);
+    formData.append("turnstileToken", turnstileToken);
 
-    setUploadStatus("uploading");
-    setUploadedKey(null);
+    setUploadPending();
 
     const response = await fetch("/api/recordings", {
       method: "POST",
@@ -102,21 +158,42 @@ export function Recorder() {
     });
 
     if (!response.ok) {
-      setUploadStatus("error");
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null;
+      setUploadError(data?.error ?? "R2 へのアップロードに失敗しました。");
+      window.turnstile?.reset();
       return;
     }
 
     const data = (await response.json()) as { key: string };
-    setUploadedKey(data.key);
-    setUploadStatus("uploaded");
+    setUploadSuccess(
+      data.key,
+      "R2 に保存しました。次のアップロード前に再度検証してください。",
+    );
+    window.turnstile?.reset();
   };
 
   return (
     <section className="flex w-full max-w-xl flex-col gap-4 rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
       <div className="space-y-1">
         <h2 className="text-xl font-semibold">Recorder</h2>
-        <p className="text-sm text-black/60">ブラウザで録音して WAV 保存できます。</p>
+        <p className="text-sm text-black/60">
+          ブラウザで録音して WAV 保存できます。アップロードには Turnstile 検証が必要です。
+        </p>
       </div>
+
+      {turnstileSiteKey ? (
+        <div
+          className="cf-turnstile"
+          data-sitekey={turnstileSiteKey}
+          data-action="upload_recording"
+        />
+      ) : (
+        <p className="text-sm text-red-700">
+          Turnstile site key が未設定のため、アップロードできません。
+        </p>
+      )}
 
       <div className="flex flex-wrap gap-3">
         <button
@@ -138,20 +215,28 @@ export function Recorder() {
         <button
           type="button"
           onClick={handleSave}
-          disabled={recordedBlob === null || uploadStatus === "uploading"}
+          disabled={recordedBlob === null || isUploading}
           className="rounded-lg border border-black/15 px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:text-black/30"
         >
-          {uploadStatus === "uploading" ? "アップロード中..." : "保存してR2へアップロード"}
+          {isUploading ? "アップロード中..." : "保存してR2へアップロード"}
         </button>
       </div>
 
       {recordedUrl ? <audio controls src={recordedUrl} className="w-full" /> : null}
       <p className="text-sm text-black/60">状態: {status}</p>
-      {uploadStatus === "uploaded" ? (
+      {uploadedKey ? (
         <p className="text-sm text-emerald-700">R2 に保存しました: {uploadedKey}</p>
       ) : null}
-      {uploadStatus === "error" ? (
-        <p className="text-sm text-red-700">R2 へのアップロードに失敗しました。</p>
+      {uploadMessage ? (
+        <p
+          className={
+            uploadMessageTone === "error"
+              ? "text-sm text-red-700"
+              : "text-sm text-black/60"
+          }
+        >
+          {uploadMessage}
+        </p>
       ) : null}
     </section>
   );

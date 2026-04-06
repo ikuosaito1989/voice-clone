@@ -2,6 +2,7 @@ import { connection } from "next/server";
 import { CustomerSection } from "@/app/_components/customer-section";
 import { LoginForm } from "@/app/_components/login-form";
 import { Recorder } from "@/app/_components/recorder";
+import { TestDoneFeed } from "@/app/_components/test-done-feed";
 import { getCustomers } from "@/lib/db/customers";
 
 export default async function Home() {
@@ -15,6 +16,8 @@ export default async function Home() {
         <CustomerSection customerRows={customerRows} />
 
         <LoginForm />
+
+        <TestDoneFeed />
 
         <Recorder turnstileSiteKey={turnstileSiteKey} />
       </div>

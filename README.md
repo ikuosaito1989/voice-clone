@@ -45,13 +45,13 @@ flowchart TD
 ### 1. テーブルを作る
 
 ```bash
-wrangler d1 execute voice-clone --local --file=schema/jwt_auth.sql
+wrangler d1 execute voice-clone --local --file=db/migrate/20260406204200_create_users.sql
 ```
 
 リモートに作る場合:
 
 ```bash
-wrangler d1 execute voice-clone --remote --file=schema/jwt_auth.sql
+wrangler d1 execute voice-clone --remote --file=db/migrate/20260406204200_create_users.sql
 ```
 
 ### 2. ユーザーを作る

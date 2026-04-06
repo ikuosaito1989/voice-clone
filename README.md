@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎙️ こんなの作ろうとおもっている
 
-## Getting Started
+## 画面の流れ
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```mermaid
+flowchart TD
+    LP[LPページ] --> REC[ボイス録音画面<br/>特定の文章を読み上げ]
+    REC --> LOADING[ボイスクローン作成中画面]
+    LOADING --> WAIT[一定時間待機]
+    WAIT --> CHECK[再アクセス]
+    CHECK --> DONE[ボイスクローン完成済み画面]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 処理の流れ
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```mermaid
+flowchart TD
+    REC[ボイス録音]
+        --> R2_UPLOAD[R2へ音声アップロード]
 
-## Learn More
+    R2_UPLOAD
+        --> D1_SAVE[D1に録音情報を保存]
 
-To learn more about Next.js, take a look at the following resources:
+    D1_SAVE
+        --> KAGGLE[KaggleでQwen3-TTS実行<br/>ボイスクローン生成]
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    KAGGLE
+        --> R2_CLONE[R2へクローン音声アップロード]
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    R2_CLONE
+        --> D1_UPDATE[D1のステータスを完了に更新]
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    D1_UPDATE
+        --> MAIL[メール通知送信]
+```

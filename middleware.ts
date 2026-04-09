@@ -23,7 +23,7 @@ function getBearerToken(request: NextRequest) {
   return token;
 }
 
-export function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   if (PUBLIC_API_PATHS.has(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
@@ -34,7 +34,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const payload = verifyJwt(
+  const payload = await verifyJwt(
     token,
     process.env.JWT_SECRET ?? "dev-jwt-secret-change-me",
   );

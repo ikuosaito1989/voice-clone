@@ -46,7 +46,7 @@ export async function POST(request: Request) {
   }
 
   const now = Math.floor(Date.now() / 1000);
-  const token = signJwt(
+  const token = await signJwt(
     {
       sub: user.id,
       email: user.email,

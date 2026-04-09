@@ -1,5 +1,3 @@
-import { createHmac } from "node:crypto";
-
 export type JwtPayload = {
   sub: string;
   email: string;
@@ -8,26 +6,62 @@ export type JwtPayload = {
   exp: number;
 };
 
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+
+function toBase64(bytes: Uint8Array) {
+  let binary = "";
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary);
+}
+
+function fromBase64(value: string) {
+  const binary = atob(value);
+  return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+}
+
 export function encodeBase64Url(value: string) {
-  return Buffer.from(value)
-    .toString("base64")
+  return toBase64(textEncoder.encode(value))
     .replaceAll("+", "-")
     .replaceAll("/", "_")
     .replaceAll("=", "");
 }
 
-export function signJwt(
+async function importJwtKey(secret: string, usage: KeyUsage) {
+  return crypto.subtle.importKey(
+    "raw",
+    textEncoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    [usage],
+  );
+}
+
+async function signJwtValue(value: string, secret: string) {
+  const key = await importJwtKey(secret, "sign");
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    textEncoder.encode(value),
+  );
+
+  return toBase64(new Uint8Array(signature))
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replaceAll("=", "");
+}
+
+export async function signJwt(
   payload: Record<string, string | number>,
   secret: string,
 ) {
   const header = encodeBase64Url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const body = encodeBase64Url(JSON.stringify(payload));
-  const signature = createHmac("sha256", secret)
-    .update(`${header}.${body}`)
-    .digest("base64")
-    .replaceAll("+", "-")
-    .replaceAll("/", "_")
-    .replaceAll("=", "");
+  const signature = await signJwtValue(`${header}.${body}`, secret);
 
   return `${header}.${body}.${signature}`;
 }
@@ -38,23 +72,29 @@ function decodeBase64Url(value: string) {
     .replaceAll("_", "/")
     .padEnd(Math.ceil(value.length / 4) * 4, "=");
 
-  return Buffer.from(base64, "base64").toString("utf8");
+  return textDecoder.decode(fromBase64(base64));
 }
 
-export function verifyJwt(token: string, secret: string) {
+export async function verifyJwt(token: string, secret: string) {
   const [header, body, signature] = token.split(".");
   if (!header || !body || !signature) {
     return null;
   }
 
-  const expectedSignature = createHmac("sha256", secret)
-    .update(`${header}.${body}`)
-    .digest("base64")
-    .replaceAll("+", "-")
-    .replaceAll("/", "_")
-    .replaceAll("=", "");
+  const key = await importJwtKey(secret, "verify");
+  const isValidSignature = await crypto.subtle.verify(
+    "HMAC",
+    key,
+    fromBase64(
+      signature
+        .replaceAll("-", "+")
+        .replaceAll("_", "/")
+        .padEnd(Math.ceil(signature.length / 4) * 4, "="),
+    ),
+    textEncoder.encode(`${header}.${body}`),
+  );
 
-  if (signature !== expectedSignature) {
+  if (!isValidSignature) {
     return null;
   }
 

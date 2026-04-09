@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import "./globals.css";
+import "../globals.css";
 
 export const metadata: Metadata = {
   title: "Voice Recorder",
   description: "Record audio and save it as wav.",
 };
 
-export default function RootLayout({
+export default function MainLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

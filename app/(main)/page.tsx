@@ -14,11 +14,8 @@ export default async function Home() {
     <main className="min-h-screen bg-neutral-50 px-6 py-12">
       <div className="mx-auto flex max-w-5xl flex-col gap-8">
         <CustomerSection customerRows={customerRows} />
-
         <LoginForm />
-
         <TestDoneFeed />
-
         <Recorder turnstileSiteKey={turnstileSiteKey} />
       </div>
     </main>

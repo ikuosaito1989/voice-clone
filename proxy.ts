@@ -3,7 +3,11 @@ import type { NextRequest } from "next/server";
 import { verifyJwt } from "@/lib/auth/jwt";
 
 const ACCESS_TOKEN_COOKIE = "access_token";
-const PUBLIC_API_PATHS = new Set(["/api/auth/login", "/api/test/events"]);
+const PUBLIC_API_PATHS = new Set([
+  "/api/auth/login",
+  "/api/openapi",
+  "/api/test/events",
+]);
 
 function getBearerToken(request: NextRequest) {
   const authorization = request.headers.get("authorization");

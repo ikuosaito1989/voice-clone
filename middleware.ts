@@ -7,6 +7,7 @@ const PUBLIC_API_PATHS = new Set([
   "/api/auth/login",
   "/api/openapi",
   "/api/test/events",
+  "/api/reference_audio",
 ]);
 
 function getBearerToken(request: NextRequest) {

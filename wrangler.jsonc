@@ -12,7 +12,7 @@
   "r2_buckets": [
     {
       "binding": "recordings",
-      "bucket_name": "my-bucket",
+      "bucket_name": "voice-clone",
       "remote": true,
     },
   ],

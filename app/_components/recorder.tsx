@@ -9,7 +9,18 @@ type UploadMessageTone = "default" | "error";
 declare global {
   interface Window {
     turnstile?: {
-      reset: () => void;
+      render: (
+        container: HTMLElement,
+        options: {
+          action: string;
+          callback?: (token: string) => void;
+          "error-callback"?: () => void;
+          "expired-callback"?: () => void;
+          sitekey: string;
+        },
+      ) => string;
+      remove: (widgetId: string) => void;
+      reset: (widgetId?: string) => void;
     };
   }
 }

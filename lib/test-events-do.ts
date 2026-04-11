@@ -2,7 +2,6 @@ import { DurableObject } from "cloudflare:workers";
 import {
   formatDoneEvent,
   isDonePayload,
-  type DonePayload,
   createDonePayload,
 } from "@/lib/test-events-shared";
 

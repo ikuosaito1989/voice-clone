@@ -6,7 +6,6 @@ export type DonePayload = {
 };
 
 export const TEST_EVENTS_OBJECT_NAME = "test-events";
-export const LAST_EVENT_KEY = "last-done-event";
 
 export function formatDoneEvent(payload: DonePayload) {
   return encoder.encode(`event: done\ndata: ${JSON.stringify(payload)}\n\n`);

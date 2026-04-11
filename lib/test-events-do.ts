@@ -2,7 +2,6 @@ import { DurableObject } from "cloudflare:workers";
 import {
   formatDoneEvent,
   isDonePayload,
-  LAST_EVENT_KEY,
   type DonePayload,
   createDonePayload,
 } from "@/lib/test-events-shared";
@@ -18,15 +17,6 @@ const encoder = new TextEncoder();
 export class TestEventsDurableObject extends DurableObject<CloudflareEnv> {
   private subscribers = new Set<Subscriber>();
   private lastPayload: DonePayload | null = null;
-
-  constructor(ctx: DurableObjectState, env: CloudflareEnv) {
-    super(ctx, env);
-
-    ctx.blockConcurrencyWhile(async () => {
-      this.lastPayload =
-        (await ctx.storage.get<DonePayload>(LAST_EVENT_KEY)) ?? null;
-    });
-  }
 
   async fetch(request: Request) {
     const url = new URL(request.url);
@@ -91,7 +81,6 @@ export class TestEventsDurableObject extends DurableObject<CloudflareEnv> {
     const payload = isDonePayload(parsed) ? parsed : createDonePayload();
 
     this.lastPayload = payload;
-    await this.ctx.storage.put(LAST_EVENT_KEY, payload);
 
     for (const subscriber of this.subscribers) {
       if (!subscriber.closed) {

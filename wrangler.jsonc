@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "main": ".open-next/worker.js",
+  "main": "worker.ts",
   "name": "voice-clone",
   // Set this to today's date
   "compatibility_date": "2026-04-03",
@@ -22,6 +22,20 @@
       "database_name": "voice-clone",
       "database_id": "c73da22b-971e-4153-83b1-119f0eb8dff6",
       "remote": true,
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "TEST_EVENTS_DO",
+        "class_name": "TestEventsDurableObject",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": ["TestEventsDurableObject"],
     },
   ],
 }

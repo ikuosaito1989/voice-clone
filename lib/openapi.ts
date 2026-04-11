@@ -136,7 +136,7 @@ export const openApiDocument = createDocument({
     },
     "/api/test/complete": {
       post: {
-        summary: "Publish SSE done event",
+        summary: "Publish a Durable Object-backed done event",
         security: [{ bearerAuth: [] }],
         responses: {
           "200": {
@@ -152,7 +152,7 @@ export const openApiDocument = createDocument({
     },
     "/api/test/events": {
       get: {
-        summary: "SSE stream for done events",
+        summary: "SSE stream backed by a Durable Object",
         responses: {
           "200": {
             description: "Server-sent events stream",

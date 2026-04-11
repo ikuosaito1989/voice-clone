@@ -1,13 +1,9 @@
-import { createTestEventsStream } from "@/lib/test-events";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createTestEventsStreamResponse } from "@/lib/test-events-client";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return new Response(createTestEventsStream(), {
-    headers: {
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
-      "Content-Type": "text/event-stream; charset=utf-8",
-    },
-  });
+  const { env } = await getCloudflareContext({ async: true });
+  return createTestEventsStreamResponse(env);
 }

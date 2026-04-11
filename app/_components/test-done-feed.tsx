@@ -66,7 +66,8 @@ export function TestDoneFeed() {
       <div className="space-y-1">
         <h2 className="text-xl font-semibold">Test Events</h2>
         <p className="text-sm text-black/60">
-          `/api/test/complete` が叩かれたら `done` イベントを受け取ります。
+          Durable Object経由で `/api/test/complete` のpublishを
+          `/api/test/events` でリアルタイム受信します。
         </p>
       </div>
 

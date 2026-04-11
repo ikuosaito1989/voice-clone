@@ -1,7 +1,9 @@
-import { publishDoneEvent } from "@/lib/test-events";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { publishDoneEvent } from "@/lib/test-events-client";
 
 export async function POST() {
-  const event = publishDoneEvent();
+  const { env } = await getCloudflareContext({ async: true });
+  const event = await publishDoneEvent(env);
 
   return Response.json({
     ok: true,

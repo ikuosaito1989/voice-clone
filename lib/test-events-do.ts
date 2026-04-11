@@ -16,7 +16,6 @@ const encoder = new TextEncoder();
 
 export class TestEventsDurableObject extends DurableObject<CloudflareEnv> {
   private subscribers = new Set<Subscriber>();
-  private lastPayload: DonePayload | null = null;
 
   async fetch(request: Request) {
     const url = new URL(request.url);
@@ -56,10 +55,6 @@ export class TestEventsDurableObject extends DurableObject<CloudflareEnv> {
         this.subscribers.add(subscriber);
         controller.enqueue(encoder.encode(": connected\n\n"));
 
-        if (this.lastPayload) {
-          controller.enqueue(formatDoneEvent(this.lastPayload));
-        }
-
         request.signal.addEventListener("abort", close, { once: true });
       },
       cancel: () => {
@@ -79,8 +74,6 @@ export class TestEventsDurableObject extends DurableObject<CloudflareEnv> {
   private async handlePublish(request: Request) {
     const parsed = (await request.json()) as unknown;
     const payload = isDonePayload(parsed) ? parsed : createDonePayload();
-
-    this.lastPayload = payload;
 
     for (const subscriber of this.subscribers) {
       if (!subscriber.closed) {

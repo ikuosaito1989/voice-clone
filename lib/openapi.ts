@@ -3,8 +3,8 @@ import { createDocument } from "zod-openapi";
 
 const loginRequestSchema = z
   .object({
-    email: z.email(),
-    password: z.string(),
+    email: z.email().default("admin@example.com"),
+    password: z.string().default("password"),
   })
   .meta({ id: "LoginRequest" });
 
@@ -45,16 +45,36 @@ const testCompleteResponseSchema = z
   })
   .meta({ id: "TestCompleteResponse" });
 
-const sseExampleSchema = z
-  .string()
-  .meta({ id: "SseDoneEvent" });
+const voiceCloneCompleteResponseSchema = z
+  .object({
+    ok: z.literal(true),
+    id: z.string(),
+    objectKey: z.string(),
+    clonedAt: z.string(),
+  })
+  .meta({ id: "VoiceCloneCompleteResponse" });
+
+const voiceCloneSchema = z
+  .object({
+    id: z.string(),
+    fileName: z.string(),
+  })
+  .meta({ id: "VoiceClone" });
+
+const pendingVoiceClonesResponseSchema = z
+  .object({
+    items: z.array(voiceCloneSchema),
+  })
+  .meta({ id: "PendingVoiceClonesResponse" });
+
+const sseExampleSchema = z.string().meta({ id: "SseDoneEvent" });
 
 export const openApiDocument = createDocument({
   openapi: "3.1.0",
   info: {
     title: "voice-clone API",
     version: "0.1.0",
-    description: "JWT login, test endpoint, and SSE test events.",
+    description: "JWT ログイン、テスト用エンドポイント、SSE テストイベントを提供する API。",
   },
   servers: [
     {
@@ -73,7 +93,7 @@ export const openApiDocument = createDocument({
   paths: {
     "/api/auth/login": {
       post: {
-        summary: "Login and issue JWT",
+        summary: "ログインして JWT を発行する",
         requestBody: {
           required: true,
           content: {
@@ -84,7 +104,7 @@ export const openApiDocument = createDocument({
         },
         responses: {
           "200": {
-            description: "Login success",
+            description: "ログイン成功",
             content: {
               "application/json": {
                 schema: loginSuccessSchema,
@@ -92,7 +112,7 @@ export const openApiDocument = createDocument({
             },
           },
           "400": {
-            description: "Missing email or password",
+            description: "メールアドレスまたはパスワードが不足",
             content: {
               "application/json": {
                 schema: errorResponseSchema,
@@ -100,7 +120,7 @@ export const openApiDocument = createDocument({
             },
           },
           "401": {
-            description: "Invalid credentials",
+            description: "認証情報が不正",
             content: {
               "application/json": {
                 schema: errorResponseSchema,
@@ -112,11 +132,11 @@ export const openApiDocument = createDocument({
     },
     "/api/test": {
       get: {
-        summary: "Authenticated test endpoint",
+        summary: "認証付きのテスト用エンドポイント",
         security: [{ bearerAuth: [] }],
         responses: {
           "200": {
-            description: "Success",
+            description: "成功",
             content: {
               "application/json": {
                 schema: testResponseSchema,
@@ -124,7 +144,7 @@ export const openApiDocument = createDocument({
             },
           },
           "401": {
-            description: "Unauthorized",
+            description: "認証されていない",
             content: {
               "application/json": {
                 schema: errorResponseSchema,
@@ -136,11 +156,11 @@ export const openApiDocument = createDocument({
     },
     "/api/test/complete": {
       post: {
-        summary: "Publish a Durable Object-backed done event",
+        summary: "Durable Object 経由で完了イベントを配信する",
         security: [{ bearerAuth: [] }],
         responses: {
           "200": {
-            description: "Event published",
+            description: "イベント配信成功",
             content: {
               "application/json": {
                 schema: testCompleteResponseSchema,
@@ -152,15 +172,167 @@ export const openApiDocument = createDocument({
     },
     "/api/test/events": {
       get: {
-        summary: "SSE stream backed by a Durable Object",
+        summary: "Durable Object を利用した SSE ストリーム",
         responses: {
           "200": {
-            description: "Server-sent events stream",
+            description: "Server-Sent Events ストリーム",
             content: {
               "text/event-stream": {
                 schema: sseExampleSchema,
                 example:
                   'event: done\\ndata: {"message":"21:00:00にAPIが叩かれました","time":"21:00:00"}\\n\\n',
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/reference_audio/{id}/file": {
+      post: {
+        summary: "音声クローン ID に対応する参照音声ファイルを取得する",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "参照音声ファイル",
+            content: {
+              "audio/wav": {
+                schema: {
+                  type: "string",
+                  format: "binary",
+                },
+              },
+            },
+          },
+          "400": {
+            description: "ID が不足",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "404": {
+            description: "音声クローンまたはファイルが見つからない",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "401": {
+            description: "認証されていない",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/voice_clones/pending": {
+      get: {
+        summary: "未クローンの音声クローン一覧を取得する",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          "200": {
+            description: "未クローンの音声クローン一覧",
+            content: {
+              "application/json": {
+                schema: pendingVoiceClonesResponseSchema,
+              },
+            },
+          },
+          "401": {
+            description: "認証されていない",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/voice_clones/{id}/complete": {
+      post: {
+        summary: "クローン済み音声をアップロードして完了状態にする",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["file"],
+                properties: {
+                  file: {
+                    type: "string",
+                    format: "binary",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "クローン済み音声のアップロードと完了処理に成功",
+            content: {
+              "application/json": {
+                schema: voiceCloneCompleteResponseSchema,
+              },
+            },
+          },
+          "400": {
+            description: "ID またはファイルが不足",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "401": {
+            description: "認証されていない",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "404": {
+            description: "音声クローンが見つからない",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "413": {
+            description: "ファイルサイズが大きすぎる",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
               },
             },
           },

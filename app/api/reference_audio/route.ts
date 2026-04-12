@@ -1,15 +1,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
 import { voiceClones } from "@/lib/db/schema";
-
-function sanitizeFileName(fileName: string) {
-  const trimmed = fileName.trim().toLowerCase();
-  const normalized = trimmed.replace(/[^a-z0-9._-]+/g, "-");
-  const collapsed = normalized.replace(/-+/g, "-");
-  const withoutEdges = collapsed.replace(/^-|-$/g, "");
-
-  return withoutEdges || `recording-${Date.now()}.wav`;
-}
+import { sanitizeFileName } from "@/lib/storage/sanitize-file-name";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -81,7 +73,11 @@ export async function POST(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
   const db = drizzle(env.voice_clone);
   const id = crypto.randomUUID();
-  const fileName = sanitizeFileName(file.name || `recording-${Date.now()}.wav`);
+  const fallbackFileName = `${crypto.randomUUID()}.wav`;
+  const fileName = sanitizeFileName(
+    file.name || fallbackFileName,
+    fallbackFileName,
+  );
   const objectKey = `reference_audio/${id}/${fileName}`;
 
   await env.recordings.put(objectKey, file, {

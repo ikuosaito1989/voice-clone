@@ -5,10 +5,69 @@ import { verifyJwt } from "@/lib/auth/jwt";
 const ACCESS_TOKEN_COOKIE = "access_token";
 const PUBLIC_API_PATHS = new Set([
   "/api/auth/login",
-  "/api/openapi",
   "/api/test/events",
   "/api/reference_audio",
 ]);
+
+function isSwaggerProtectedPath(pathname: string) {
+  return pathname === "/api/openapi" || pathname.startsWith("/swagger");
+}
+
+function getBasicAuthCredentials(request: NextRequest) {
+  const authorization = request.headers.get("authorization");
+  if (!authorization) {
+    return null;
+  }
+
+  const [scheme, encoded] = authorization.split(" ");
+  if (scheme !== "Basic" || !encoded) {
+    return null;
+  }
+
+  const decoded = atob(encoded);
+  const separatorIndex = decoded.indexOf(":");
+
+  if (separatorIndex < 0) {
+    return null;
+  }
+
+  return {
+    username: decoded.slice(0, separatorIndex),
+    password: decoded.slice(separatorIndex + 1),
+  };
+}
+
+function createBasicAuthResponse() {
+  return new NextResponse("Authentication required", {
+    status: 401,
+    headers: {
+      "WWW-Authenticate": 'Basic realm="Swagger", charset="UTF-8"',
+    },
+  });
+}
+
+function authorizeSwaggerRequest(request: NextRequest) {
+  const username = "12345";
+  const password = "67890";
+
+  if (!username || !password) {
+    return NextResponse.json(
+      { error: "swagger basic auth is not configured" },
+      { status: 500 },
+    );
+  }
+
+  const credentials = getBasicAuthCredentials(request);
+  if (
+    !credentials ||
+    credentials.username !== username ||
+    credentials.password !== password
+  ) {
+    return createBasicAuthResponse();
+  }
+
+  return NextResponse.next();
+}
 
 function getBearerToken(request: NextRequest) {
   const authorization = request.headers.get("authorization");
@@ -25,6 +84,10 @@ function getBearerToken(request: NextRequest) {
 }
 
 export async function middleware(request: NextRequest) {
+  if (isSwaggerProtectedPath(request.nextUrl.pathname)) {
+    return authorizeSwaggerRequest(request);
+  }
+
   if (PUBLIC_API_PATHS.has(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
@@ -47,5 +110,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  matcher: ["/api/:path*", "/swagger/:path*"],
 };

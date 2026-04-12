@@ -15,10 +15,10 @@ export const users = sqliteTable("users", {
   displayName: text("display_name"),
   role: text("role").notNull().default("user"),
   isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
-  createdAt: integer("created_at", { mode: "timestamp" })
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .defaultNow(),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .notNull()
     .defaultNow(),
 });
@@ -27,14 +27,14 @@ export type User = typeof users.$inferSelect;
 
 export const voiceClones = sqliteTable("voice_clones", {
   id: text("id").primaryKey(),
-  createdAt: integer("created_at", { mode: "timestamp" })
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .defaultNow(),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .notNull()
     .defaultNow(),
   isCloned: integer("is_cloned", { mode: "boolean" }).notNull().default(false),
-  clonedAt: integer("cloned_at", { mode: "timestamp" }),
+  clonedAt: integer("cloned_at", { mode: "timestamp_ms" }),
   fileName: text("file_name").notNull(),
 });
 

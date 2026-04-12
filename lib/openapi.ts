@@ -50,7 +50,7 @@ const voiceCloneCompleteResponseSchema = z
     ok: z.literal(true),
     id: z.string(),
     objectKey: z.string(),
-    clonedAt: z.string(),
+    clonedAt: z.iso.datetime(),
   })
   .meta({ id: "VoiceCloneCompleteResponse" });
 
@@ -60,6 +60,17 @@ const voiceCloneSchema = z
     fileName: z.string(),
   })
   .meta({ id: "VoiceClone" });
+
+const voiceCloneDetailSchema = z
+  .object({
+    id: z.string(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
+    isCloned: z.boolean(),
+    clonedAt: z.iso.datetime().nullable(),
+    fileName: z.string(),
+  })
+  .meta({ id: "VoiceCloneDetail" });
 
 const pendingVoiceClonesResponseSchema = z
   .object({
@@ -76,6 +87,12 @@ export const openApiDocument = createDocument({
     version: "0.1.0",
     description: "JWT ログイン、テスト用エンドポイント、SSE テストイベントを提供する API。",
   },
+  tags: [
+    { name: "auth", description: "認証関連 API" },
+    { name: "test", description: "テスト関連 API" },
+    { name: "reference_audio", description: "参照音声関連 API" },
+    { name: "voice_clone", description: "音声クローン関連 API" },
+  ],
   servers: [
     {
       url: "http://localhost:3000",
@@ -93,6 +110,7 @@ export const openApiDocument = createDocument({
   paths: {
     "/api/auth/login": {
       post: {
+        tags: ["auth"],
         summary: "ログインして JWT を発行する",
         requestBody: {
           required: true,
@@ -132,6 +150,7 @@ export const openApiDocument = createDocument({
     },
     "/api/test": {
       get: {
+        tags: ["test"],
         summary: "認証付きのテスト用エンドポイント",
         security: [{ bearerAuth: [] }],
         responses: {
@@ -156,6 +175,7 @@ export const openApiDocument = createDocument({
     },
     "/api/test/complete": {
       post: {
+        tags: ["test"],
         summary: "Durable Object 経由で完了イベントを配信する",
         security: [{ bearerAuth: [] }],
         responses: {
@@ -172,6 +192,7 @@ export const openApiDocument = createDocument({
     },
     "/api/test/events": {
       get: {
+        tags: ["test"],
         summary: "Durable Object を利用した SSE ストリーム",
         responses: {
           "200": {
@@ -189,6 +210,7 @@ export const openApiDocument = createDocument({
     },
     "/api/reference_audio/{id}/file": {
       post: {
+        tags: ["reference_audio"],
         summary: "音声クローン ID に対応する参照音声ファイルを取得する",
         security: [{ bearerAuth: [] }],
         parameters: [
@@ -240,8 +262,60 @@ export const openApiDocument = createDocument({
         },
       },
     },
+    "/api/voice-clone/{id}": {
+      get: {
+        tags: ["voice_clone"],
+        summary: "指定した ID の音声クローン情報を取得する",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "音声クローン情報",
+            content: {
+              "application/json": {
+                schema: voiceCloneDetailSchema,
+              },
+            },
+          },
+          "400": {
+            description: "ID が不足",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "401": {
+            description: "認証されていない",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "404": {
+            description: "音声クローンが見つからない",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+        },
+      },
+    },
     "/api/voice_clones/pending": {
       get: {
+        tags: ["voice_clone"],
         summary: "未クローンの音声クローン一覧を取得する",
         security: [{ bearerAuth: [] }],
         responses: {
@@ -266,6 +340,7 @@ export const openApiDocument = createDocument({
     },
     "/api/voice_clones/{id}/complete": {
       post: {
+        tags: ["voice_clone"],
         summary: "クローン済み音声をアップロードして完了状態にする",
         security: [{ bearerAuth: [] }],
         parameters: [

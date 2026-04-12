@@ -14,4 +14,6 @@
 - 依存追加や実装方針は、OpenNext/Cloudflare で動くことを優先してください。
 - API を追加・変更した場合は、対応する OpenAPI 定義も更新してください。
 - OpenAPI の `summary`、`description`、レスポンス説明など利用者向け文言は日本語で記述してください。
+- API で `createdAt`、`updatedAt`、`clonedAt` などの日時を返す場合は、ISO 8601 文字列で返してください。
+- DB にミリ秒 epoch の整数を保存する日時カラムは、Drizzle schema で `integer(..., { mode: "timestamp_ms" })` を使って定義してください。
 <!-- END:nextjs-agent-rules -->

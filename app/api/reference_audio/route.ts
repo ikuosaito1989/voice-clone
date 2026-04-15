@@ -90,11 +90,12 @@ export async function POST(request: Request) {
     id,
     isCloned: false,
     clonedAt: null,
-    fileName: objectKey,
+    referenceAudioPath: objectKey,
+    clonedAudioPath: null,
   });
 
   return Response.json({
     id,
-    fileName: objectKey,
+    referenceAudioPath: objectKey,
   });
 }

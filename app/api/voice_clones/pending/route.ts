@@ -10,7 +10,7 @@ export async function GET() {
   const pendingVoiceClones = await db
     .select({
       id: voiceClones.id,
-      fileName: voiceClones.fileName,
+      referenceAudioPath: voiceClones.referenceAudioPath,
     })
     .from(voiceClones)
     .where(eq(voiceClones.isCloned, false));

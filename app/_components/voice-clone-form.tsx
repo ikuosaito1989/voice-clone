@@ -198,12 +198,12 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
 
     const data = (await response.json()) as {
       id: string;
-      fileName: string;
+      referenceAudioPath: string;
     };
 
     setSubmissionState("success");
     setUploadedId(data.id);
-    setUploadedFileName(data.fileName);
+    setUploadedFileName(data.referenceAudioPath);
     setMessage("R2 へのアップロードと D1 への登録が完了しました。");
     window.turnstile?.reset();
     router.push(`/voice-clone/${data.id}`);
@@ -279,7 +279,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
           ) : null}
           {uploadedFileName ? (
             <p className="break-all text-sm text-slate-600">
-              file_name: {uploadedFileName}
+              reference_audio_path: {uploadedFileName}
             </p>
           ) : null}
           {message ? (

@@ -56,6 +56,7 @@ export async function POST(
     .set({
       isCloned: true,
       clonedAt,
+      clonedAudioPath: objectKey,
       updatedAt: clonedAt,
     })
     .where(eq(voiceClones.id, id));
@@ -63,7 +64,7 @@ export async function POST(
   return Response.json({
     ok: true,
     id,
-    objectKey,
+    clonedAudioPath: objectKey,
     clonedAt: clonedAt.toISOString(),
   });
 }

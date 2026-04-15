@@ -19,7 +19,7 @@ export async function POST(
 
   const [voiceClone] = await db
     .select({
-      fileName: voiceClones.fileName,
+      referenceAudioPath: voiceClones.referenceAudioPath,
     })
     .from(voiceClones)
     .where(eq(voiceClones.id, id))
@@ -29,7 +29,7 @@ export async function POST(
     return Response.json({ error: "voice clone not found" }, { status: 404 });
   }
 
-  const object = await env.recordings.get(voiceClone.fileName);
+  const object = await env.recordings.get(voiceClone.referenceAudioPath);
 
   if (!object) {
     return Response.json(
@@ -40,7 +40,7 @@ export async function POST(
 
   const headers: Record<string, string> = {
     etag: object.httpEtag,
-    "content-disposition": `inline; filename="${voiceClone.fileName.split("/").at(-1) ?? `${id}.wav`}"`,
+    "content-disposition": `inline; filename="${voiceClone.referenceAudioPath.split("/").at(-1) ?? `${id}.wav`}"`,
     "content-type": object.httpMetadata?.contentType ?? "audio/wav",
   };
 

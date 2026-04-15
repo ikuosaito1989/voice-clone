@@ -49,7 +49,7 @@ const voiceCloneCompleteResponseSchema = z
   .object({
     ok: z.literal(true),
     id: z.string(),
-    objectKey: z.string(),
+    clonedAudioPath: z.string(),
     clonedAt: z.iso.datetime(),
   })
   .meta({ id: "VoiceCloneCompleteResponse" });
@@ -57,7 +57,7 @@ const voiceCloneCompleteResponseSchema = z
 const voiceCloneSchema = z
   .object({
     id: z.string(),
-    fileName: z.string(),
+    referenceAudioPath: z.string(),
   })
   .meta({ id: "VoiceClone" });
 
@@ -68,7 +68,8 @@ const voiceCloneDetailSchema = z
     updatedAt: z.iso.datetime(),
     isCloned: z.boolean(),
     clonedAt: z.iso.datetime().nullable(),
-    fileName: z.string(),
+    referenceAudioPath: z.string(),
+    clonedAudioPath: z.string().nullable(),
   })
   .meta({ id: "VoiceCloneDetail" });
 
@@ -202,6 +203,68 @@ export const openApiDocument = createDocument({
                 schema: sseExampleSchema,
                 example:
                   'event: done\\ndata: {"message":"21:00:00にAPIが叩かれました","time":"21:00:00"}\\n\\n',
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/reference_audio": {
+      post: {
+        tags: ["reference_audio"],
+        summary: "参照音声をアップロードして音声クローンを作成する",
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["file", "turnstileToken"],
+                properties: {
+                  file: {
+                    type: "string",
+                    format: "binary",
+                    description: "アップロードする WAV 形式の参照音声ファイル",
+                  },
+                  turnstileToken: {
+                    type: "string",
+                    description: "Cloudflare Turnstile の検証トークン",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "参照音声のアップロードと音声クローン作成に成功",
+            content: {
+              "application/json": {
+                schema: voiceCloneSchema,
+              },
+            },
+          },
+          "400": {
+            description: "ファイルまたは Turnstile トークンが不足、またはファイル形式が不正",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "403": {
+            description: "Turnstile 検証に失敗",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "413": {
+            description: "ファイルサイズが大きすぎる",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
               },
             },
           },

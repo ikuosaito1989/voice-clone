@@ -25,7 +25,8 @@ export async function GET(
       updatedAt: voiceClones.updatedAt,
       isCloned: voiceClones.isCloned,
       clonedAt: voiceClones.clonedAt,
-      fileName: voiceClones.fileName,
+      referenceAudioPath: voiceClones.referenceAudioPath,
+      clonedAudioPath: voiceClones.clonedAudioPath,
     })
     .from(voiceClones)
     .where(eq(voiceClones.id, id))
@@ -41,6 +42,7 @@ export async function GET(
     updatedAt: toIso8601(voiceClone.updatedAt),
     isCloned: voiceClone.isCloned,
     clonedAt: toIso8601(voiceClone.clonedAt),
-    fileName: voiceClone.fileName,
+    referenceAudioPath: voiceClone.referenceAudioPath,
+    clonedAudioPath: voiceClone.clonedAudioPath,
   });
 }

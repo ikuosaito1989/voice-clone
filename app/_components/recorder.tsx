@@ -6,6 +6,8 @@ import { convertBlobToWav } from "@/lib/audio/convert-blob-to-wav";
 type RecorderStatus = "idle" | "recording" | "stopped";
 type UploadMessageTone = "default" | "error";
 
+const maxRecordingDurationMs = 10_000;
+
 declare global {
   interface Window {
     turnstile?: {
@@ -32,6 +34,7 @@ type RecorderProps = {
 export function Recorder({ turnstileSiteKey }: RecorderProps) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const recordingTimerRef = useRef<number | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const [status, setStatus] = useState<RecorderStatus>("idle");
   const [isUploading, setIsUploading] = useState(false);
@@ -45,6 +48,27 @@ export function Recorder({ turnstileSiteKey }: RecorderProps) {
   const stopActiveStream = () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
+  };
+
+  const clearRecordingTimer = () => {
+    if (recordingTimerRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(recordingTimerRef.current);
+    recordingTimerRef.current = null;
+  };
+
+  const stopMediaRecorder = () => {
+    clearRecordingTimer();
+
+    if (mediaRecorderRef.current?.state === "recording") {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+      return true;
+    }
+
+    return false;
   };
 
   const clearUploadState = () => {
@@ -76,6 +100,8 @@ export function Recorder({ turnstileSiteKey }: RecorderProps) {
   };
 
   const resetRecording = () => {
+    clearRecordingTimer();
+
     if (recordedUrl) {
       URL.revokeObjectURL(recordedUrl);
     }
@@ -100,6 +126,8 @@ export function Recorder({ turnstileSiteKey }: RecorderProps) {
     };
 
     mediaRecorder.onstop = () => {
+      clearRecordingTimer();
+
       const blob = new Blob(chunksRef.current, {
         type: mediaRecorder.mimeType || "audio/webm",
       });
@@ -114,13 +142,14 @@ export function Recorder({ turnstileSiteKey }: RecorderProps) {
     mediaRecorderRef.current = mediaRecorder;
     streamRef.current = stream;
     mediaRecorder.start();
+    recordingTimerRef.current = window.setTimeout(() => {
+      stopMediaRecorder();
+    }, maxRecordingDurationMs);
     setStatus("recording");
   };
 
   const handleStop = () => {
-    if (mediaRecorderRef.current?.state === "recording") {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current = null;
+    if (stopMediaRecorder()) {
       return;
     }
 

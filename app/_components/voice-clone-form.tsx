@@ -8,6 +8,8 @@ type FormStep = "record" | "confirm";
 type RecorderStatus = "idle" | "recording" | "ready";
 type SubmissionState = "idle" | "submitting" | "success" | "error";
 
+const maxRecordingDurationMs = 10_000;
+
 declare global {
   interface Window {
     turnstile?: {
@@ -38,6 +40,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
   const router = useRouter();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  const recordingTimerRef = useRef<number | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const [step, setStep] = useState<FormStep>("record");
@@ -57,7 +60,30 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
     mediaStreamRef.current = null;
   };
 
+  const clearRecordingTimer = () => {
+    if (recordingTimerRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(recordingTimerRef.current);
+    recordingTimerRef.current = null;
+  };
+
+  const stopMediaRecorder = () => {
+    clearRecordingTimer();
+
+    if (mediaRecorderRef.current?.state === "recording") {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+      return true;
+    }
+
+    return false;
+  };
+
   const resetRecordedAudio = () => {
+    clearRecordingTimer();
+
     if (recordedUrl) {
       URL.revokeObjectURL(recordedUrl);
     }
@@ -89,6 +115,8 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
     };
 
     mediaRecorder.onstop = async () => {
+      clearRecordingTimer();
+
       const sourceBlob = new Blob(chunksRef.current, {
         type: mediaRecorder.mimeType || "audio/webm",
       });
@@ -105,13 +133,14 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
     mediaRecorderRef.current = mediaRecorder;
     mediaStreamRef.current = stream;
     mediaRecorder.start();
+    recordingTimerRef.current = window.setTimeout(() => {
+      stopMediaRecorder();
+    }, maxRecordingDurationMs);
     setRecorderStatus("recording");
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current?.state === "recording") {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current = null;
+    if (stopMediaRecorder()) {
       return;
     }
 

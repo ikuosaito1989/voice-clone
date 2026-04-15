@@ -58,6 +58,7 @@ const voiceCloneSchema = z
   .object({
     id: z.string(),
     referenceAudioPath: z.string(),
+    recordedText: z.string(),
   })
   .meta({ id: "VoiceClone" });
 
@@ -70,6 +71,7 @@ const voiceCloneDetailSchema = z
     clonedAt: z.iso.datetime().nullable(),
     referenceAudioPath: z.string(),
     clonedAudioPath: z.string().nullable(),
+    recordedText: z.string(),
   })
   .meta({ id: "VoiceCloneDetail" });
 
@@ -219,7 +221,7 @@ export const openApiDocument = createDocument({
             "multipart/form-data": {
               schema: {
                 type: "object",
-                required: ["file", "turnstileToken"],
+                required: ["file", "turnstileToken", "recordedText"],
                 properties: {
                   file: {
                     type: "string",
@@ -229,6 +231,10 @@ export const openApiDocument = createDocument({
                   turnstileToken: {
                     type: "string",
                     description: "Cloudflare Turnstile の検証トークン",
+                  },
+                  recordedText: {
+                    type: "string",
+                    description: "録音時に読み上げた文章",
                   },
                 },
               },
@@ -245,7 +251,7 @@ export const openApiDocument = createDocument({
             },
           },
           "400": {
-            description: "ファイルまたは Turnstile トークンが不足、またはファイル形式が不正",
+            description: "ファイル、Turnstile トークン、録音文章が不足、またはファイル形式が不正",
             content: {
               "application/json": {
                 schema: errorResponseSchema,

@@ -11,6 +11,7 @@ export async function GET() {
     .select({
       id: voiceClones.id,
       referenceAudioPath: voiceClones.referenceAudioPath,
+      recordedText: voiceClones.recordedText,
     })
     .from(voiceClones)
     .where(eq(voiceClones.isCloned, false));

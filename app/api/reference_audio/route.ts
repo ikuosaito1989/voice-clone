@@ -7,6 +7,7 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file");
   const turnstileToken = formData.get("turnstileToken");
+  const recordedText = formData.get("recordedText");
 
   if (!(file instanceof File)) {
     return Response.json({ error: "file is required" }, { status: 400 });
@@ -15,6 +16,13 @@ export async function POST(request: Request) {
   if (typeof turnstileToken !== "string" || turnstileToken.length === 0) {
     return Response.json(
       { error: "turnstile token is required" },
+      { status: 400 },
+    );
+  }
+
+  if (typeof recordedText !== "string" || recordedText.trim().length === 0) {
+    return Response.json(
+      { error: "recorded text is required" },
       { status: 400 },
     );
   }
@@ -92,10 +100,12 @@ export async function POST(request: Request) {
     clonedAt: null,
     referenceAudioPath: objectKey,
     clonedAudioPath: null,
+    recordedText: recordedText.trim(),
   });
 
   return Response.json({
     id,
     referenceAudioPath: objectKey,
+    recordedText: recordedText.trim(),
   });
 }

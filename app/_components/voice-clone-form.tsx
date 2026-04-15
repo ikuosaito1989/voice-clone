@@ -31,6 +31,9 @@ type VoiceCloneFormProps = {
   turnstileSiteKey: string;
 };
 
+const defaultRecordedText =
+  "あの、最近少し暖かくなってきましたね。えっと、季節の変わり目は体調を崩しやすいので、無理をせずに過ごすことが大切だと思います。そうですね、しっかり休んで、毎日を元気に過ごしていきたいですね。";
+
 export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
   const router = useRouter();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -45,6 +48,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
   const [message, setMessage] = useState<string | null>(null);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+  const [recordedText, setRecordedText] = useState(defaultRecordedText);
   const [uploadedId, setUploadedId] = useState<string | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
@@ -62,6 +66,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
     setRecorderStatus("idle");
     setRecordedBlob(null);
     setRecordedUrl(null);
+    setRecordedText(defaultRecordedText);
     setUploadedId(null);
     setUploadedFileName(null);
     setMessage(null);
@@ -174,6 +179,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
     const formData = new FormData();
     formData.append("file", recordedBlob, fileName);
     formData.append("turnstileToken", turnstileToken);
+    formData.append("recordedText", recordedText);
 
     setSubmissionState("submitting");
     setMessage(null);
@@ -199,6 +205,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
     const data = (await response.json()) as {
       id: string;
       referenceAudioPath: string;
+      recordedText: string;
     };
 
     setSubmissionState("success");
@@ -230,6 +237,14 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
             録音を止める
           </button>
           <p className="text-sm text-white/60">状態: {recorderStatus}</p>
+          <div className="max-w-3xl space-y-3 text-center">
+            <p className="text-base font-semibold text-white">
+              次の例文を読み上げてください
+            </p>
+            <p className="text-lg leading-8 text-white/85">
+              {defaultRecordedText}
+            </p>
+          </div>
         </div>
       ) : null}
 
@@ -239,6 +254,17 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
           {recordedUrl ? (
             <audio controls src={recordedUrl} className="w-full max-w-2xl" />
           ) : null}
+          <label className="flex w-full max-w-2xl flex-col gap-3 text-left">
+            <span className="text-sm font-semibold text-slate-700">
+              録音した文章
+            </span>
+            <textarea
+              value={recordedText}
+              onChange={(event) => setRecordedText(event.currentTarget.value)}
+              rows={5}
+              className="w-full resize-y rounded-2xl border border-amber-200 bg-white px-4 py-3 text-base leading-7 text-slate-950 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+            />
+          </label>
           <div className="flex flex-col items-center gap-4">
             {turnstileSiteKey ? (
               <div ref={attachTurnstile} className="min-h-16" />
@@ -261,7 +287,8 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
                 disabled={
                   recordedBlob === null ||
                   submissionState === "submitting" ||
-                  !isTurnstileVerified
+                  !isTurnstileVerified ||
+                  recordedText.trim().length === 0
                 }
                 className="rounded-full bg-emerald-500 px-8 py-4 text-base font-semibold text-white disabled:cursor-not-allowed disabled:bg-emerald-200"
               >

@@ -3,6 +3,10 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { voiceClones } from "@/lib/db/schema";
 import { sanitizeFileName } from "@/lib/storage/sanitize-file-name";
+import {
+  getPendingVoiceClones,
+  uploadPendingVoiceClonesSnapshot,
+} from "@/lib/voice-clones/pending";
 
 export async function POST(
   request: Request,
@@ -60,6 +64,10 @@ export async function POST(
       updatedAt: clonedAt,
     })
     .where(eq(voiceClones.id, id));
+
+  const pendingVoiceClones = await getPendingVoiceClones(db);
+
+  await uploadPendingVoiceClonesSnapshot(env.recordings, pendingVoiceClones);
 
   return Response.json({
     ok: true,

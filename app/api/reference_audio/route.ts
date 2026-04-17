@@ -2,6 +2,10 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
 import { voiceClones } from "@/lib/db/schema";
 import { sanitizeFileName } from "@/lib/storage/sanitize-file-name";
+import {
+  getPendingVoiceClones,
+  uploadPendingVoiceClonesSnapshot,
+} from "@/lib/voice-clones/pending";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -102,6 +106,10 @@ export async function POST(request: Request) {
     clonedAudioPath: null,
     recordedText: recordedText.trim(),
   });
+
+  const pendingVoiceClones = await getPendingVoiceClones(db);
+
+  await uploadPendingVoiceClonesSnapshot(env.recordings, pendingVoiceClones);
 
   return Response.json({
     id,

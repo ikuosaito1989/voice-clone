@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md}\"",
     "lint": "eslint --ext \".js,.ts,.tsx\" app lib scripts",
     "lint:fix": "eslint --fix --ext \".js,.ts,.tsx\" app lib scripts",
     "create:user": "node --experimental-strip-types scripts/create-user.ts",
@@ -31,6 +33,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "prettier": "^3.8.3",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "^4.80.0"

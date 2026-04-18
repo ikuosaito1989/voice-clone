@@ -22,7 +22,9 @@ export default async function VoiceClonePage(
         <section className="w-full rounded-[2.5rem] bg-white/90 p-8 text-center shadow-[0_30px_120px_rgba(15,23,42,0.12)] backdrop-blur">
           {!voiceClone.isCloned ? <VoiceCloneLoadingState /> : null}
 
-          {voiceClone.isCloned ? <VoiceCloneCompleteState id={voiceClone.id} /> : null}
+          {voiceClone.isCloned ? (
+            <VoiceCloneCompleteState id={voiceClone.id} />
+          ) : null}
         </section>
       </div>
     </main>

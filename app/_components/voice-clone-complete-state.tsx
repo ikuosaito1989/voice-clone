@@ -2,9 +2,7 @@ type VoiceCloneCompleteStateProps = {
   id: string;
 };
 
-export function VoiceCloneCompleteState({
-  id,
-}: VoiceCloneCompleteStateProps) {
+export function VoiceCloneCompleteState({ id }: VoiceCloneCompleteStateProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-4">

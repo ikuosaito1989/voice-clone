@@ -83,10 +83,7 @@ function escapeSql(value: string) {
   return value.replaceAll("'", "''");
 }
 
-function requiredOption(
-  options: CreateUserOptions,
-  key: "email" | "password",
-) {
+function requiredOption(options: CreateUserOptions, key: "email" | "password") {
   const value = options[key];
   if (typeof value === "string" && value.length > 0) {
     return value;

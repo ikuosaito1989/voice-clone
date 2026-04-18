@@ -198,9 +198,9 @@ export function Recorder({ turnstileSiteKey }: RecorderProps) {
     });
 
     if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as
-        | { error?: string }
-        | null;
+      const data = (await response.json().catch(() => null)) as {
+        error?: string;
+      } | null;
       setUploadError(data?.error ?? "R2 へのアップロードに失敗しました。");
       window.turnstile?.reset();
       return;
@@ -219,7 +219,8 @@ export function Recorder({ turnstileSiteKey }: RecorderProps) {
       <div className="space-y-1">
         <h2 className="text-xl font-semibold">Recorder</h2>
         <p className="text-sm text-black/60">
-          ブラウザで録音して WAV 保存できます。アップロードには Turnstile 検証が必要です。
+          ブラウザで録音して WAV 保存できます。アップロードには Turnstile
+          検証が必要です。
         </p>
       </div>
 
@@ -262,10 +263,14 @@ export function Recorder({ turnstileSiteKey }: RecorderProps) {
         </button>
       </div>
 
-      {recordedUrl ? <audio controls src={recordedUrl} className="w-full" /> : null}
+      {recordedUrl ? (
+        <audio controls src={recordedUrl} className="w-full" />
+      ) : null}
       <p className="text-sm text-black/60">状態: {status}</p>
       {uploadedKey ? (
-        <p className="text-sm text-emerald-700">R2 に保存しました: {uploadedKey}</p>
+        <p className="text-sm text-emerald-700">
+          R2 に保存しました: {uploadedKey}
+        </p>
       ) : null}
       {uploadMessage ? (
         <p

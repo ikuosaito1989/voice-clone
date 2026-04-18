@@ -94,7 +94,9 @@ export async function middleware(request: NextRequest) {
 
   if (
     PUBLIC_API_PATHS.has(request.nextUrl.pathname) ||
-    PUBLIC_API_PATTERNS.some((pattern) => pattern.test(request.nextUrl.pathname))
+    PUBLIC_API_PATTERNS.some((pattern) =>
+      pattern.test(request.nextUrl.pathname),
+    )
   ) {
     return NextResponse.next();
   }

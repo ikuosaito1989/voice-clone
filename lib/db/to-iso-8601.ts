@@ -4,7 +4,8 @@ function normalizeTimestampValue(value: Date | number | string) {
   }
 
   if (typeof value === "number") {
-    const timestamp = Math.abs(value) < 1_000_000_000_000 ? value * 1000 : value;
+    const timestamp =
+      Math.abs(value) < 1_000_000_000_000 ? value * 1000 : value;
     return new Date(timestamp);
   }
 

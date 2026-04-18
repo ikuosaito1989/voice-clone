@@ -30,12 +30,15 @@ function encodeWav(audioBuffer: AudioBuffer) {
   view.setUint32(40, dataLength, true);
 
   let offset = 44;
-  const channels = Array.from(
-    { length: channelCount },
-    (_, index) => audioBuffer.getChannelData(index),
+  const channels = Array.from({ length: channelCount }, (_, index) =>
+    audioBuffer.getChannelData(index),
   );
 
-  for (let sampleIndex = 0; sampleIndex < audioBuffer.length; sampleIndex += 1) {
+  for (
+    let sampleIndex = 0;
+    sampleIndex < audioBuffer.length;
+    sampleIndex += 1
+  ) {
     for (let channelIndex = 0; channelIndex < channelCount; channelIndex += 1) {
       const sample = Math.max(
         -1,
@@ -54,11 +57,11 @@ function encodeWav(audioBuffer: AudioBuffer) {
 export async function convertBlobToWav(blob: Blob) {
   const arrayBuffer = await blob.arrayBuffer();
   const audioContext = new AudioContext();
-  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer).finally(
-    async () => {
+  const audioBuffer = await audioContext
+    .decodeAudioData(arrayBuffer)
+    .finally(async () => {
       await audioContext.close();
-    },
-  );
+    });
 
   return encodeWav(audioBuffer);
 }

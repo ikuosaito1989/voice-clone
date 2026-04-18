@@ -90,7 +90,8 @@ export const openApiDocument = createDocument({
   info: {
     title: "voice-clone API",
     version: "0.1.0",
-    description: "JWT ログイン、テスト用エンドポイント、SSE テストイベントを提供する API。",
+    description:
+      "JWT ログイン、テスト用エンドポイント、SSE テストイベントを提供する API。",
   },
   tags: [
     { name: "auth", description: "認証関連 API" },
@@ -223,7 +224,12 @@ export const openApiDocument = createDocument({
             "multipart/form-data": {
               schema: {
                 type: "object",
-                required: ["file", "turnstileToken", "recordedText", "desiredText"],
+                required: [
+                  "file",
+                  "turnstileToken",
+                  "recordedText",
+                  "desiredText",
+                ],
                 properties: {
                   file: {
                     type: "string",
@@ -257,7 +263,8 @@ export const openApiDocument = createDocument({
             },
           },
           "400": {
-            description: "ファイル、Turnstile トークン、録音文章、生成したい文章が不足、またはファイル形式が不正",
+            description:
+              "ファイル、Turnstile トークン、録音文章、生成したい文章が不足、またはファイル形式が不正",
             content: {
               "application/json": {
                 schema: errorResponseSchema,
@@ -422,7 +429,8 @@ export const openApiDocument = createDocument({
             },
           },
           "404": {
-            description: "音声クローンまたはクローン済み音声ファイルが見つからない",
+            description:
+              "音声クローンまたはクローン済み音声ファイルが見つからない",
             content: {
               "application/json": {
                 schema: errorResponseSchema,

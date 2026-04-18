@@ -42,13 +42,15 @@ export function LoginForm() {
       body: JSON.stringify({ email, password }),
     });
 
-    const data = (await response.json().catch(() => null)) as LoginResult | null;
+    const data = (await response
+      .json()
+      .catch(() => null)) as LoginResult | null;
 
     if (!response.ok || !data?.ok) {
       setIsSubmitting(false);
       setMessage(
         data && "error" in data
-          ? data.error ?? "ログインに失敗しました。"
+          ? (data.error ?? "ログインに失敗しました。")
           : "ログインに失敗しました。",
       );
       return;
@@ -66,7 +68,8 @@ export function LoginForm() {
       <div className="space-y-1">
         <h2 className="text-xl font-semibold">Login</h2>
         <p className="text-sm text-black/60">
-          `/api/auth/login` にメールアドレスとパスワードを送って JWT を取得します。
+          `/api/auth/login` にメールアドレスとパスワードを送って JWT
+          を取得します。
         </p>
       </div>
 
@@ -100,7 +103,9 @@ export function LoginForm() {
       {token ? (
         <div className="rounded-lg bg-black/5 p-3">
           <p className="text-xs font-medium text-black/50">Access Token</p>
-          <p className="mt-1 break-all font-mono text-xs text-black/80">{token}</p>
+          <p className="mt-1 break-all font-mono text-xs text-black/80">
+            {token}
+          </p>
         </div>
       ) : null}
     </section>

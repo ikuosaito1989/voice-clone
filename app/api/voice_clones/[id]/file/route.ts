@@ -30,13 +30,19 @@ export async function GET(
   }
 
   if (!voiceClone.clonedAudioPath) {
-    return Response.json({ error: "cloned audio is not ready" }, { status: 404 });
+    return Response.json(
+      { error: "cloned audio is not ready" },
+      { status: 404 },
+    );
   }
 
   const object = await env.recordings.get(voiceClone.clonedAudioPath);
 
   if (!object) {
-    return Response.json({ error: "cloned audio file not found" }, { status: 404 });
+    return Response.json(
+      { error: "cloned audio file not found" },
+      { status: 404 },
+    );
   }
 
   const fileName = `${new Date().toISOString().slice(0, 10)}-cloned.wav`;

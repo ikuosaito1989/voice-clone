@@ -8,6 +8,7 @@ export type PendingVoiceCloneItem = {
   id: string;
   referenceAudioPath: string;
   recordedText: string;
+  desiredText: string;
 };
 
 export type PendingVoiceClonesResponse = {
@@ -22,6 +23,7 @@ export async function getPendingVoiceClones(
       id: voiceClones.id,
       referenceAudioPath: voiceClones.referenceAudioPath,
       recordedText: voiceClones.recordedText,
+      desiredText: voiceClones.desiredText,
     })
     .from(voiceClones)
     .where(eq(voiceClones.isCloned, false));

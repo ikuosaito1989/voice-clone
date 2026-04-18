@@ -38,6 +38,7 @@ export const voiceClones = sqliteTable("voice_clones", {
   referenceAudioPath: text("reference_audio_path").notNull(),
   clonedAudioPath: text("cloned_audio_path"),
   recordedText: text("recorded_text").notNull(),
+  desiredText: text("desired_text").notNull(),
 });
 
 export type VoiceClone = typeof voiceClones.$inferSelect;

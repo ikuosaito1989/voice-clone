@@ -12,6 +12,7 @@ export async function POST(request: Request) {
   const file = formData.get("file");
   const turnstileToken = formData.get("turnstileToken");
   const recordedText = formData.get("recordedText");
+  const desiredText = formData.get("desiredText");
 
   if (!(file instanceof File)) {
     return Response.json({ error: "file is required" }, { status: 400 });
@@ -27,6 +28,13 @@ export async function POST(request: Request) {
   if (typeof recordedText !== "string" || recordedText.trim().length === 0) {
     return Response.json(
       { error: "recorded text is required" },
+      { status: 400 },
+    );
+  }
+
+  if (typeof desiredText !== "string" || desiredText.trim().length === 0) {
+    return Response.json(
+      { error: "desired text is required" },
       { status: 400 },
     );
   }
@@ -105,6 +113,7 @@ export async function POST(request: Request) {
     referenceAudioPath: objectKey,
     clonedAudioPath: null,
     recordedText: recordedText.trim(),
+    desiredText: desiredText.trim(),
   });
 
   const pendingVoiceClones = await getPendingVoiceClones(db);
@@ -115,5 +124,6 @@ export async function POST(request: Request) {
     id,
     referenceAudioPath: objectKey,
     recordedText: recordedText.trim(),
+    desiredText: desiredText.trim(),
   });
 }

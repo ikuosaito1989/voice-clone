@@ -59,6 +59,7 @@ const voiceCloneSchema = z
     id: z.string(),
     referenceAudioPath: z.string(),
     recordedText: z.string(),
+    desiredText: z.string(),
   })
   .meta({ id: "VoiceClone" });
 
@@ -72,6 +73,7 @@ const voiceCloneDetailSchema = z
     referenceAudioPath: z.string(),
     clonedAudioPath: z.string().nullable(),
     recordedText: z.string(),
+    desiredText: z.string(),
   })
   .meta({ id: "VoiceCloneDetail" });
 
@@ -221,7 +223,7 @@ export const openApiDocument = createDocument({
             "multipart/form-data": {
               schema: {
                 type: "object",
-                required: ["file", "turnstileToken", "recordedText"],
+                required: ["file", "turnstileToken", "recordedText", "desiredText"],
                 properties: {
                   file: {
                     type: "string",
@@ -235,6 +237,10 @@ export const openApiDocument = createDocument({
                   recordedText: {
                     type: "string",
                     description: "録音時に読み上げた文章",
+                  },
+                  desiredText: {
+                    type: "string",
+                    description: "生成したい音声の文章",
                   },
                 },
               },
@@ -251,7 +257,7 @@ export const openApiDocument = createDocument({
             },
           },
           "400": {
-            description: "ファイル、Turnstile トークン、録音文章が不足、またはファイル形式が不正",
+            description: "ファイル、Turnstile トークン、録音文章、生成したい文章が不足、またはファイル形式が不正",
             content: {
               "application/json": {
                 schema: errorResponseSchema,

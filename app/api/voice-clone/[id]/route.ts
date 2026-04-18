@@ -28,6 +28,7 @@ export async function GET(
       referenceAudioPath: voiceClones.referenceAudioPath,
       clonedAudioPath: voiceClones.clonedAudioPath,
       recordedText: voiceClones.recordedText,
+      desiredText: voiceClones.desiredText,
     })
     .from(voiceClones)
     .where(eq(voiceClones.id, id))
@@ -46,5 +47,6 @@ export async function GET(
     referenceAudioPath: voiceClone.referenceAudioPath,
     clonedAudioPath: voiceClone.clonedAudioPath,
     recordedText: voiceClone.recordedText,
+    desiredText: voiceClone.desiredText,
   });
 }

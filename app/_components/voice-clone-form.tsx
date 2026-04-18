@@ -8,7 +8,7 @@ type FormStep = "record" | "confirm";
 type RecorderStatus = "idle" | "recording" | "ready";
 type SubmissionState = "idle" | "submitting" | "success" | "error";
 
-const maxRecordingDurationMs = 10_000;
+const maxRecordingDurationMs = 30_000;
 
 declare global {
   interface Window {
@@ -52,6 +52,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [recordedText, setRecordedText] = useState(defaultRecordedText);
+  const [desiredText, setDesiredText] = useState("");
   const [uploadedId, setUploadedId] = useState<string | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
@@ -93,6 +94,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
     setRecordedBlob(null);
     setRecordedUrl(null);
     setRecordedText(defaultRecordedText);
+    setDesiredText("");
     setUploadedId(null);
     setUploadedFileName(null);
     setMessage(null);
@@ -209,6 +211,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
     formData.append("file", recordedBlob, fileName);
     formData.append("turnstileToken", turnstileToken);
     formData.append("recordedText", recordedText);
+    formData.append("desiredText", desiredText);
 
     setSubmissionState("submitting");
     setMessage(null);
@@ -235,6 +238,7 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
       id: string;
       referenceAudioPath: string;
       recordedText: string;
+      desiredText: string;
     };
 
     setSubmissionState("success");
@@ -294,6 +298,18 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
               className="w-full resize-y rounded-2xl border border-amber-200 bg-white px-4 py-3 text-base leading-7 text-slate-950 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
             />
           </label>
+          <label className="flex w-full max-w-2xl flex-col gap-3 text-left">
+            <span className="text-sm font-semibold text-slate-700">
+              生成したい文章
+            </span>
+            <textarea
+              value={desiredText}
+              onChange={(event) => setDesiredText(event.currentTarget.value)}
+              rows={5}
+              className="w-full resize-y rounded-2xl border border-amber-200 bg-white px-4 py-3 text-base leading-7 text-slate-950 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+              placeholder="生成したい音声の文章を入力してください"
+            />
+          </label>
           <div className="flex flex-col items-center gap-4">
             {turnstileSiteKey ? (
               <div ref={attachTurnstile} className="min-h-16" />
@@ -317,7 +333,8 @@ export function VoiceCloneForm({ turnstileSiteKey }: VoiceCloneFormProps) {
                   recordedBlob === null ||
                   submissionState === "submitting" ||
                   !isTurnstileVerified ||
-                  recordedText.trim().length === 0
+                  recordedText.trim().length === 0 ||
+                  desiredText.trim().length === 0
                 }
                 className="rounded-full bg-emerald-500 px-8 py-4 text-base font-semibold text-white disabled:cursor-not-allowed disabled:bg-emerald-200"
               >

@@ -337,7 +337,7 @@ export const openApiDocument = createDocument({
         },
       },
     },
-    "/api/voice-clones/{id}": {
+    "/api/voice_clones/{id}": {
       get: {
         tags: ["voice_clone"],
         summary: "指定した ID の音声クローン情報を取得する",

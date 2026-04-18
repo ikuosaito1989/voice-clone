@@ -8,6 +8,10 @@ const PUBLIC_API_PATHS = new Set([
   "/api/test/events",
   "/api/reference_audio",
 ]);
+const PUBLIC_API_PATTERNS = [
+  /^\/api\/voice_clones\/[^/]+$/,
+  /^\/api\/voice_clones\/[^/]+\/file$/,
+];
 
 function isSwaggerProtectedPath(pathname: string) {
   return pathname === "/api/openapi" || pathname.startsWith("/swagger");
@@ -88,7 +92,10 @@ export async function middleware(request: NextRequest) {
     return authorizeSwaggerRequest(request);
   }
 
-  if (PUBLIC_API_PATHS.has(request.nextUrl.pathname)) {
+  if (
+    PUBLIC_API_PATHS.has(request.nextUrl.pathname) ||
+    PUBLIC_API_PATTERNS.some((pattern) => pattern.test(request.nextUrl.pathname))
+  ) {
     return NextResponse.next();
   }
 

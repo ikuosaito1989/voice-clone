@@ -341,7 +341,6 @@ export const openApiDocument = createDocument({
       get: {
         tags: ["voice_clone"],
         summary: "指定した ID の音声クローン情報を取得する",
-        security: [{ bearerAuth: [] }],
         parameters: [
           {
             name: "id",
@@ -379,6 +378,51 @@ export const openApiDocument = createDocument({
           },
           "404": {
             description: "音声クローンが見つからない",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/voice_clones/{id}/file": {
+      get: {
+        tags: ["voice_clone"],
+        summary: "指定した ID のクローン済み音声ファイルをダウンロードする",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "クローン済み音声ファイル",
+            content: {
+              "audio/wav": {
+                schema: {
+                  type: "string",
+                  format: "binary",
+                },
+              },
+            },
+          },
+          "400": {
+            description: "ID が不足",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+          "404": {
+            description: "音声クローンまたはクローン済み音声ファイルが見つからない",
             content: {
               "application/json": {
                 schema: errorResponseSchema,

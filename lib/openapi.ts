@@ -54,6 +54,10 @@ const voiceCloneCompleteResponseSchema = z
   })
   .meta({ id: "VoiceCloneCompleteResponse" });
 
+const voiceCloneCompletedEventSchema = z.string().meta({
+  id: "VoiceCloneCompletedEvent",
+});
+
 const voiceCloneSchema = z
   .object({
     id: z.string(),
@@ -98,11 +102,6 @@ export const openApiDocument = createDocument({
     { name: "test", description: "テスト関連 API" },
     { name: "reference_audio", description: "参照音声関連 API" },
     { name: "voice_clone", description: "音声クローン関連 API" },
-  ],
-  servers: [
-    {
-      url: "http://localhost:3000",
-    },
   ],
   components: {
     securitySchemes: {
@@ -532,6 +531,42 @@ export const openApiDocument = createDocument({
           },
           "413": {
             description: "ファイルサイズが大きすぎる",
+            content: {
+              "application/json": {
+                schema: errorResponseSchema,
+              },
+            },
+          },
+        },
+      },
+    },
+    "/api/voice_clones/{id}/events": {
+      get: {
+        tags: ["voice_clone"],
+        summary: "指定した ID の完了イベントを SSE で購読する",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "完了イベントの Server-Sent Events ストリーム",
+            content: {
+              "text/event-stream": {
+                schema: voiceCloneCompletedEventSchema,
+                example:
+                  'event: completed\\ndata: {"id":"voice-clone-1","clonedAt":"2026-04-19T12:34:56.000Z"}\\n\\n',
+              },
+            },
+          },
+          "400": {
+            description: "ID が不足",
             content: {
               "application/json": {
                 schema: errorResponseSchema,

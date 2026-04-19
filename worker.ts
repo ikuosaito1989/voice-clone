@@ -3,12 +3,13 @@
 import worker from "./.open-next/worker.js";
 import { TestEventsDurableObject } from "./lib/test-events-do";
 import { deleteVoiceCloneObjects } from "./lib/storage/delete-voice-clone-objects";
+import { VoiceCloneEventsDurableObject } from "./lib/voice-clone-events-do";
 import {
   deleteVoiceCloneRecords,
   getStaleVoiceClones,
 } from "./lib/voice-clones/cleanup";
 
-export { TestEventsDurableObject };
+export { TestEventsDurableObject, VoiceCloneEventsDurableObject };
 
 const workerHandler = worker as ExportedHandler<CloudflareEnv>;
 const THREE_DAYS_IN_MS = 3 * 24 * 60 * 60 * 1000;

@@ -33,12 +33,20 @@
         "name": "TEST_EVENTS_DO",
         "class_name": "TestEventsDurableObject",
       },
+      {
+        "name": "VOICE_CLONE_EVENTS_DO",
+        "class_name": "VoiceCloneEventsDurableObject",
+      },
     ],
   },
   "migrations": [
     {
       "tag": "v1",
       "new_sqlite_classes": ["TestEventsDurableObject"],
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": ["VoiceCloneEventsDurableObject"],
     },
   ],
 }

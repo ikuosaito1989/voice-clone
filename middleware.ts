@@ -10,6 +10,7 @@ const PUBLIC_API_PATHS = new Set([
 ]);
 const PUBLIC_API_PATTERNS = [
   /^\/api\/voice_clones\/[^/]+$/,
+  /^\/api\/voice_clones\/[^/]+\/events$/,
   /^\/api\/voice_clones\/[^/]+\/file$/,
 ];
 

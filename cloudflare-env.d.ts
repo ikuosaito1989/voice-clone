@@ -10,6 +10,7 @@ declare namespace Cloudflare {
 		voice_clone: D1Database;
 		ASSETS: Fetcher;
 		TEST_EVENTS_DO: DurableObjectNamespace<import("./lib/test-events-do").TestEventsDurableObject>;
+		VOICE_CLONE_EVENTS_DO: DurableObjectNamespace<import("./lib/voice-clone-events-do").VoiceCloneEventsDurableObject>;
 		TURNSTILE_SITE_KEY: string;
 		TURNSTILE_SECRET_KEY: string;
 	}

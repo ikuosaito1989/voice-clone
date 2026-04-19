@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { voiceClones } from "@/lib/db/schema";
 import { sanitizeFileName } from "@/lib/storage/sanitize-file-name";
+import { publishVoiceCloneCompletedEvent } from "@/lib/voice-clone-events-client";
 import {
   getPendingVoiceClones,
   uploadPendingVoiceClonesSnapshot,
@@ -68,6 +69,7 @@ export async function POST(
   const pendingVoiceClones = await getPendingVoiceClones(db);
 
   await uploadPendingVoiceClonesSnapshot(env.recordings, pendingVoiceClones);
+  await publishVoiceCloneCompletedEvent(env, id, clonedAt);
 
   return Response.json({
     ok: true,

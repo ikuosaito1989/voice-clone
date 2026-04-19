@@ -3,10 +3,7 @@ import type { NextRequest } from "next/server";
 import { verifyJwt } from "@/lib/auth/jwt";
 
 const ACCESS_TOKEN_COOKIE = "access_token";
-const PUBLIC_API_PATHS = new Set([
-  "/api/auth/login",
-  "/api/reference_audio",
-]);
+const PUBLIC_API_PATHS = new Set(["/api/auth/login", "/api/reference_audio"]);
 const PUBLIC_API_PATTERNS = [
   /^\/api\/voice_clones\/[^/]+$/,
   /^\/api\/voice_clones\/[^/]+\/events$/,

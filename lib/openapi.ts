@@ -31,20 +31,6 @@ const errorResponseSchema = z
   })
   .meta({ id: "ErrorResponse" });
 
-const testResponseSchema = z
-  .object({
-    ok: z.literal(true),
-  })
-  .meta({ id: "TestResponse" });
-
-const testCompleteResponseSchema = z
-  .object({
-    ok: z.literal(true),
-    message: z.string(),
-    time: z.string(),
-  })
-  .meta({ id: "TestCompleteResponse" });
-
 const voiceCloneCompleteResponseSchema = z
   .object({
     ok: z.literal(true),
@@ -87,19 +73,15 @@ const pendingVoiceClonesResponseSchema = z
   })
   .meta({ id: "PendingVoiceClonesResponse" });
 
-const sseExampleSchema = z.string().meta({ id: "SseDoneEvent" });
-
 export const openApiDocument = createDocument({
   openapi: "3.1.0",
   info: {
     title: "voice-clone API",
     version: "0.1.0",
-    description:
-      "JWT ログイン、テスト用エンドポイント、SSE テストイベントを提供する API。",
+    description: "JWT ログインと音声クローン機能を提供する API。",
   },
   tags: [
     { name: "auth", description: "認証関連 API" },
-    { name: "test", description: "テスト関連 API" },
     { name: "reference_audio", description: "参照音声関連 API" },
     { name: "voice_clone", description: "音声クローン関連 API" },
   ],
@@ -147,66 +129,6 @@ export const openApiDocument = createDocument({
             content: {
               "application/json": {
                 schema: errorResponseSchema,
-              },
-            },
-          },
-        },
-      },
-    },
-    "/api/test": {
-      get: {
-        tags: ["test"],
-        summary: "認証付きのテスト用エンドポイント",
-        security: [{ bearerAuth: [] }],
-        responses: {
-          "200": {
-            description: "成功",
-            content: {
-              "application/json": {
-                schema: testResponseSchema,
-              },
-            },
-          },
-          "401": {
-            description: "認証されていない",
-            content: {
-              "application/json": {
-                schema: errorResponseSchema,
-              },
-            },
-          },
-        },
-      },
-    },
-    "/api/test/complete": {
-      post: {
-        tags: ["test"],
-        summary: "Durable Object 経由で完了イベントを配信する",
-        security: [{ bearerAuth: [] }],
-        responses: {
-          "200": {
-            description: "イベント配信成功",
-            content: {
-              "application/json": {
-                schema: testCompleteResponseSchema,
-              },
-            },
-          },
-        },
-      },
-    },
-    "/api/test/events": {
-      get: {
-        tags: ["test"],
-        summary: "Durable Object を利用した SSE ストリーム",
-        responses: {
-          "200": {
-            description: "Server-Sent Events ストリーム",
-            content: {
-              "text/event-stream": {
-                schema: sseExampleSchema,
-                example:
-                  'event: done\\ndata: {"message":"21:00:00にAPIが叩かれました","time":"21:00:00"}\\n\\n',
               },
             },
           },

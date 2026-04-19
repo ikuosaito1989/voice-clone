@@ -5,7 +5,6 @@ import { verifyJwt } from "@/lib/auth/jwt";
 const ACCESS_TOKEN_COOKIE = "access_token";
 const PUBLIC_API_PATHS = new Set([
   "/api/auth/login",
-  "/api/test/events",
   "/api/reference_audio",
 ]);
 const PUBLIC_API_PATTERNS = [

@@ -4,4 +4,19 @@ import worker from "./.open-next/worker.js";
 import { TestEventsDurableObject } from "./lib/test-events-do";
 
 export { TestEventsDurableObject };
-export default worker;
+
+const workerHandler = worker as ExportedHandler<CloudflareEnv>;
+
+async function handleScheduled(controller: ScheduledController) {
+  console.log("Cron trigger completed", {
+    cron: controller.cron,
+    scheduledTime: new Date(controller.scheduledTime).toISOString(),
+  });
+}
+
+export default {
+  ...workerHandler,
+  async scheduled(controller, _env, ctx) {
+    ctx.waitUntil(handleScheduled(controller));
+  },
+} satisfies ExportedHandler<CloudflareEnv>;

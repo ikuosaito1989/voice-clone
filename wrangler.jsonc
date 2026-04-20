@@ -38,7 +38,15 @@
   "migrations": [
     {
       "tag": "v1",
+      "new_sqlite_classes": ["TestEventsDurableObject"],
+    },
+    {
+      "tag": "v2",
       "new_sqlite_classes": ["VoiceCloneEventsDurableObject"],
+    },
+    {
+      "tag": "v3",
+      "deleted_classes": ["TestEventsDurableObject"],
     },
   ],
 }

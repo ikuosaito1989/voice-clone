@@ -1,11 +1,7 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { drizzle } from "drizzle-orm/d1";
-import { getPendingVoiceClones } from "@/lib/voice-clones/pending";
+import { listPendingVoiceClones } from "@/server/repositories/voice-clones";
 
 export async function GET() {
-  const { env } = await getCloudflareContext({ async: true });
-  const db = drizzle(env.voice_clone);
-  const pendingVoiceClones = await getPendingVoiceClones(db);
+  const pendingVoiceClones = await listPendingVoiceClones();
 
   return Response.json(pendingVoiceClones);
 }

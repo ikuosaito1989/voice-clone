@@ -2,7 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import {
   formatVoiceCloneCompletedEvent,
   isVoiceCloneCompletedPayload,
-} from "@/lib/voice-clone-events-shared";
+} from "@/server/events/voice-clone-events-shared";
 
 type Subscriber = {
   controller: ReadableStreamDefaultController<Uint8Array>;

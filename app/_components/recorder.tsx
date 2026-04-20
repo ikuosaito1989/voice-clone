@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { convertBlobToWav } from "@/lib/audio/convert-blob-to-wav";
+import { convertBlobToWav } from "@/lib/convert-blob-to-wav";
 
 type RecorderStatus = "idle" | "recording" | "stopped";
 type UploadMessageTone = "default" | "error";

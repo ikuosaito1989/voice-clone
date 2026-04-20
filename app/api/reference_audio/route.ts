@@ -1,11 +1,10 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { drizzle } from "drizzle-orm/d1";
-import { voiceClones } from "@/lib/db/schema";
-import { sanitizeFileName } from "@/lib/storage/sanitize-file-name";
 import {
-  getPendingVoiceClones,
-  uploadPendingVoiceClonesSnapshot,
-} from "@/lib/voice-clones/pending";
+  createVoiceClone,
+  listPendingVoiceClones,
+} from "@/server/repositories/voice-clones";
+import { sanitizeFileName } from "@/server/storage/sanitize-file-name";
+import { uploadPendingVoiceClonesSnapshot } from "@/server/storage/upload-pending-voice-clones-snapshot";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -91,7 +90,6 @@ export async function POST(request: Request) {
   }
 
   const { env } = await getCloudflareContext({ async: true });
-  const db = drizzle(env.voice_clone);
   const id = crypto.randomUUID();
   const fallbackFileName = `${crypto.randomUUID()}.wav`;
   const fileName = sanitizeFileName(
@@ -106,17 +104,14 @@ export async function POST(request: Request) {
     },
   });
 
-  await db.insert(voiceClones).values({
+  await createVoiceClone({
     id,
-    isCloned: false,
-    clonedAt: null,
     referenceAudioPath: objectKey,
-    clonedAudioPath: null,
     recordedText: recordedText.trim(),
     desiredText: desiredText.trim(),
   });
 
-  const pendingVoiceClones = await getPendingVoiceClones(db);
+  const pendingVoiceClones = await listPendingVoiceClones();
 
   await uploadPendingVoiceClonesSnapshot(env.recordings, pendingVoiceClones);
 

@@ -1,7 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/d1";
-import { voiceClones } from "@/lib/db/schema";
+import { findClonedAudioPathByVoiceCloneId } from "@/server/repositories/voice-clones";
 
 export async function GET(
   _request: Request,
@@ -15,28 +13,20 @@ export async function GET(
   }
 
   const { env } = await getCloudflareContext({ async: true });
-  const db = drizzle(env.voice_clone);
+  const clonedAudio = await findClonedAudioPathByVoiceCloneId(id);
 
-  const [voiceClone] = await db
-    .select({
-      clonedAudioPath: voiceClones.clonedAudioPath,
-    })
-    .from(voiceClones)
-    .where(eq(voiceClones.id, id))
-    .limit(1);
-
-  if (!voiceClone) {
+  if (!clonedAudio.found) {
     return Response.json({ error: "voice clone not found" }, { status: 404 });
   }
 
-  if (!voiceClone.clonedAudioPath) {
+  if (!clonedAudio.path) {
     return Response.json(
       { error: "cloned audio is not ready" },
       { status: 404 },
     );
   }
 
-  const object = await env.recordings.get(voiceClone.clonedAudioPath);
+  const object = await env.recordings.get(clonedAudio.path);
 
   if (!object) {
     return Response.json(

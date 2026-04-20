@@ -1,7 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/d1";
-import { voiceClones } from "@/lib/db/schema";
+import { findReferenceAudioPathByVoiceCloneId } from "@/server/repositories/voice-clones";
 
 export async function POST(
   _request: Request,
@@ -15,21 +13,13 @@ export async function POST(
   }
 
   const { env } = await getCloudflareContext({ async: true });
-  const db = drizzle(env.voice_clone);
+  const referenceAudioPath = await findReferenceAudioPathByVoiceCloneId(id);
 
-  const [voiceClone] = await db
-    .select({
-      referenceAudioPath: voiceClones.referenceAudioPath,
-    })
-    .from(voiceClones)
-    .where(eq(voiceClones.id, id))
-    .limit(1);
-
-  if (!voiceClone) {
+  if (!referenceAudioPath) {
     return Response.json({ error: "voice clone not found" }, { status: 404 });
   }
 
-  const object = await env.recordings.get(voiceClone.referenceAudioPath);
+  const object = await env.recordings.get(referenceAudioPath);
 
   if (!object) {
     return Response.json(
@@ -40,7 +30,7 @@ export async function POST(
 
   const headers: Record<string, string> = {
     etag: object.httpEtag,
-    "content-disposition": `inline; filename="${voiceClone.referenceAudioPath.split("/").at(-1) ?? `${id}.wav`}"`,
+    "content-disposition": `inline; filename="${referenceAudioPath.split("/").at(-1) ?? `${id}.wav`}"`,
     "content-type": object.httpMetadata?.contentType ?? "audio/wav",
   };
 

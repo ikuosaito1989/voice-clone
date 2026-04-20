@@ -1,10 +1,7 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/d1";
 import { NextResponse } from "next/server";
-import { signJwt } from "@/lib/auth/jwt";
-import { verifyPassword } from "@/lib/auth/password";
-import { users } from "@/lib/db/schema";
+import { signJwt } from "@/lib/jwt";
+import { verifyPassword } from "@/lib/password";
+import { findUserByEmail } from "@/server/repositories/users";
 
 const ACCESS_TOKEN_COOKIE = "access_token";
 const ACCESS_TOKEN_TTL_SECONDS = 60 * 15;
@@ -26,20 +23,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { env } = await getCloudflareContext({ async: true });
-  const db = drizzle(env.voice_clone);
-  const [user] = await db
-    .select({
-      id: users.id,
-      email: users.email,
-      passwordHash: users.passwordHash,
-      displayName: users.displayName,
-      role: users.role,
-      isActive: users.isActive,
-    })
-    .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
+  const user = await findUserByEmail(email);
 
   if (!user || !user.isActive || !verifyPassword(password, user.passwordHash)) {
     return Response.json({ error: "invalid credentials" }, { status: 401 });

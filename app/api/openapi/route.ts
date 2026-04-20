@@ -1,4 +1,4 @@
-import { openApiDocument } from "@/lib/openapi";
+import { openApiDocument } from "@/server/openapi/document";
 
 export async function GET(request: Request) {
   const origin = new URL(request.url).origin;

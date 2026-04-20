@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { convertBlobToWav } from "@/lib/audio/convert-blob-to-wav";
+import { convertBlobToWav } from "@/lib/convert-blob-to-wav";
 
 type FormStep = "record" | "confirm";
 type RecorderStatus = "idle" | "recording" | "ready";

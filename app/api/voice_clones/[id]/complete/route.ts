@@ -1,5 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { publishVoiceCloneCompletedEvent } from "@/lib/voice-clone-events-client";
+import { publishVoiceCloneCompletedEvent } from "@/server/events/voice-clone-events-client";
 
 export async function POST(
   request: Request,

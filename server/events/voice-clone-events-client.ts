@@ -1,7 +1,7 @@
 import {
   createVoiceCloneCompletedPayload,
   type VoiceCloneCompletedPayload,
-} from "@/lib/voice-clone-events-shared";
+} from "@/server/events/voice-clone-events-shared";
 
 function getVoiceCloneEventsStub(env: CloudflareEnv, id: string) {
   const durableObjectId = env.VOICE_CLONE_EVENTS_DO.idFromName(

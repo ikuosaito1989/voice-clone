@@ -1,7 +1,7 @@
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { VoiceCloneStatus } from "@/app/_components/voice-clone-status";
-import { getVoiceClone } from "@/lib/voice-clones/get-voice-clone";
+import { findVoiceCloneById } from "@/server/repositories/voice-clones";
 
 export default async function VoiceClonePage(
   props: PageProps<"/voice-clone/[id]">,
@@ -9,7 +9,7 @@ export default async function VoiceClonePage(
   await connection();
 
   const { id } = await props.params;
-  const voiceClone = await getVoiceClone(id);
+  const voiceClone = await findVoiceCloneById(id);
 
   if (!voiceClone) {
     notFound();

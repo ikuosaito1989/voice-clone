@@ -1,5 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { createVoiceCloneEventsStreamResponse } from "@/lib/voice-clone-events-client";
+import { createVoiceCloneEventsStreamResponse } from "@/server/events/voice-clone-events-client";
 
 export const dynamic = "force-dynamic";
 

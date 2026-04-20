@@ -1,4 +1,4 @@
-import type { StaleVoiceClone } from "@/lib/voice-clones/cleanup";
+import type { StaleVoiceClone } from "@/server/repositories/voice-clones";
 
 function isDefined<T>(value: T | null | undefined): value is T {
   return value != null;

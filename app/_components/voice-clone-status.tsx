@@ -3,6 +3,7 @@
 import { startTransition, useSyncExternalStore } from "react";
 import { VoiceCloneCompleteState } from "@/app/_components/voice-clone-complete-state";
 import { VoiceCloneLoadingState } from "@/app/_components/voice-clone-loading-state";
+import { parseVoiceCloneCompletedPayload } from "@/server/events/voice-clone-events-shared";
 
 type VoiceCloneStatusProps = {
   id: string;
@@ -19,15 +20,6 @@ function emit(nextValue: boolean) {
   listeners.forEach((listener) => listener());
 }
 
-function isCompletedEventData(value: unknown): value is { id: string } {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const candidate = value as Record<string, unknown>;
-  return typeof candidate.id === "string";
-}
-
 function ensureEventSource(id: string) {
   if (typeof window === "undefined" || eventSource || snapshot) {
     return;
@@ -38,8 +30,9 @@ function ensureEventSource(id: string) {
 
   eventSource.addEventListener("completed", (event) => {
     const data = JSON.parse((event as MessageEvent).data) as unknown;
+    const payloadResult = parseVoiceCloneCompletedPayload(data);
 
-    if (!isCompletedEventData(data) || data.id !== id) {
+    if (!payloadResult.success || payloadResult.data.id !== id) {
       return;
     }
 

@@ -1,7 +1,7 @@
 import { DurableObject } from "cloudflare:workers";
 import {
   formatVoiceCloneCompletedEvent,
-  isVoiceCloneCompletedPayload,
+  parseVoiceCloneCompletedPayload,
 } from "@/server/events/voice-clone-events-shared";
 
 type Subscriber = {
@@ -71,17 +71,20 @@ export class VoiceCloneEventsDurableObject extends DurableObject<CloudflareEnv> 
 
   private async handlePublish(request: Request) {
     const parsed = (await request.json()) as unknown;
+    const payloadResult = parseVoiceCloneCompletedPayload(parsed);
 
-    if (!isVoiceCloneCompletedPayload(parsed)) {
+    if (!payloadResult.success) {
       return Response.json({ error: "invalid payload" }, { status: 400 });
     }
 
     for (const subscriber of this.subscribers) {
       if (!subscriber.closed) {
-        subscriber.controller.enqueue(formatVoiceCloneCompletedEvent(parsed));
+        subscriber.controller.enqueue(
+          formatVoiceCloneCompletedEvent(payloadResult.data),
+        );
       }
     }
 
-    return Response.json(parsed);
+    return Response.json(payloadResult.data);
   }
 }

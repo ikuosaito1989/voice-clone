@@ -15,6 +15,7 @@
 - Node.js 専用の依存や API を新たに追加しないでください。
 - `node:crypto`、`fs`、`path` など Node runtime 前提の実装は、Edge/Cloudflare 互換な代替手段がない場合を除いて使わないでください。
 - 依存追加や実装方針は、OpenNext/Cloudflare で動くことを優先してください。
+- 手書きの型ガードより `zod` による schema 定義と `parse` / `safeParse` を優先してください。
 - API を追加・変更した場合は、対応する OpenAPI 定義も更新してください。
 - OpenAPI の `summary`、`description`、レスポンス説明など利用者向け文言は日本語で記述してください。
 - API で `createdAt`、`updatedAt`、`clonedAt` などの日時を返す場合は、ISO 8601 文字列で返してください。

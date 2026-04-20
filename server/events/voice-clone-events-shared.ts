@@ -1,14 +1,15 @@
+import { z } from "zod";
+
 const encoder = new TextEncoder();
 
-export type VoiceCloneCompletedPayload = {
-  id: string;
-  clonedAt: string;
-};
+export const voiceCloneCompletedPayloadSchema = z.object({
+  id: z.string(),
+  clonedAt: z.iso.datetime(),
+});
 
-const voiceCloneCompletedPayloadSchema = {
-  id: "string",
-  clonedAt: "string",
-} as const;
+export type VoiceCloneCompletedPayload = z.infer<
+  typeof voiceCloneCompletedPayloadSchema
+>;
 
 export function formatVoiceCloneCompletedEvent(
   payload: VoiceCloneCompletedPayload,
@@ -22,22 +23,12 @@ export function createVoiceCloneCompletedPayload(
   id: string,
   clonedAt: Date,
 ): VoiceCloneCompletedPayload {
-  return {
+  return voiceCloneCompletedPayloadSchema.parse({
     id,
     clonedAt: clonedAt.toISOString(),
-  };
+  });
 }
 
-export function isVoiceCloneCompletedPayload(
-  value: unknown,
-): value is VoiceCloneCompletedPayload {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const candidate = value as Record<string, unknown>;
-
-  return Object.entries(voiceCloneCompletedPayloadSchema).every(
-    ([key, expectedType]) => typeof candidate[key] === expectedType,
-  );
+export function parseVoiceCloneCompletedPayload(value: unknown) {
+  return voiceCloneCompletedPayloadSchema.safeParse(value);
 }

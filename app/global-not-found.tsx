@@ -3,7 +3,7 @@ import { NotFoundPage } from "@/app/_components/not-found-page";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "404 | Voice Recorder",
+  title: "404 | neglegere",
   description: "指定されたページは見つかりませんでした。",
 };
 

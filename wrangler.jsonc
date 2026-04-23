@@ -5,6 +5,9 @@
   // Set this to today's date
   "compatibility_date": "2026-04-03",
   "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "NEXTAUTH_URL": "https://neglegere.com",
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS",

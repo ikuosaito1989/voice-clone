@@ -3,8 +3,9 @@ import Script from "next/script";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "Voice Recorder",
-  description: "Record audio and save it as wav.",
+  title: "neglegere",
+  description:
+    "参照音声と入力テキストから音声クローンを生成するためのアプリです。",
 };
 
 export default function MainLayout({

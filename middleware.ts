@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { verifyJwt } from "@/lib/jwt";
 
 const ACCESS_TOKEN_COOKIE = "access_token";
-const PUBLIC_API_PATHS = new Set(["/api/auth/login", "/api/reference_audio"]);
+const PUBLIC_API_PATHS = new Set(["/api/reference_audio"]);
 const PUBLIC_API_PATTERNS = [
   /^\/api\/voice_clones\/[^/]+$/,
   /^\/api\/voice_clones\/[^/]+\/events$/,
@@ -90,6 +90,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (
+    request.nextUrl.pathname.startsWith("/api/auth/") ||
     PUBLIC_API_PATHS.has(request.nextUrl.pathname) ||
     PUBLIC_API_PATTERNS.some((pattern) =>
       pattern.test(request.nextUrl.pathname),

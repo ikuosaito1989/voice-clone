@@ -1,5 +1,6 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { publishVoiceCloneCompletedEvent } from "@/server/events/voice-clone-events-client";
+import { sendVoiceCloneCompletedEmail } from "@/server/email/send-voice-clone-completed-email";
 
 export async function POST(
   request: Request,
@@ -72,6 +73,10 @@ export async function POST(
 
   const { env } = await getCloudflareContext({ async: true });
   const { id } = await context.params;
-  await publishVoiceCloneCompletedEvent(env, id, new Date());
+  const clonedAt = new Date();
+
+  await publishVoiceCloneCompletedEvent(env, id, clonedAt);
+  await sendVoiceCloneCompletedEmail(env, id, clonedAt);
+
   return Response.json({});
 }

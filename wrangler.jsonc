@@ -7,6 +7,8 @@
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "NEXTAUTH_URL": "https://neglegere.com",
+    "VOICE_CLONE_COMPLETE_EMAIL_FROM": "info@noreply.neglegere.com",
+    "VOICE_CLONE_COMPLETE_EMAIL_TO": "ikuosaito1989@gmail.com",
   },
   "assets": {
     "directory": ".open-next/assets",
@@ -38,6 +40,13 @@
       },
     ],
   },
+  "send_email": [
+    {
+      "name": "VOICE_CLONE_COMPLETE_EMAIL",
+      "allowed_sender_addresses": ["info@noreply.neglegere.com"],
+      "remote": true,
+    },
+  ],
   "migrations": [
     {
       "tag": "v1",

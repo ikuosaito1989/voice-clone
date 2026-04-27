@@ -10,8 +10,11 @@ declare namespace Cloudflare {
 		voice_clone: D1Database;
 		ASSETS: Fetcher;
 		VOICE_CLONE_EVENTS_DO: DurableObjectNamespace<import("./lib/voice-clone-events-do").VoiceCloneEventsDurableObject>;
+		VOICE_CLONE_COMPLETE_EMAIL: SendEmail;
 		TURNSTILE_SITE_KEY: string;
 		TURNSTILE_SECRET_KEY: string;
+		VOICE_CLONE_COMPLETE_EMAIL_FROM: string;
+		VOICE_CLONE_COMPLETE_EMAIL_TO: string;
 	}
 }
 interface CloudflareEnv extends Cloudflare.Env {}
@@ -19,7 +22,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "TURNSTILE_SITE_KEY" | "TURNSTILE_SECRET_KEY">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "TURNSTILE_SITE_KEY" | "TURNSTILE_SECRET_KEY" | "VOICE_CLONE_COMPLETE_EMAIL_FROM" | "VOICE_CLONE_COMPLETE_EMAIL_TO">> {}
 }
 
 // Begin runtime types

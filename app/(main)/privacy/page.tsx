@@ -14,9 +14,7 @@ export default function PrivacyPage() {
           <Link href="/" className="text-sm font-medium text-slate-600">
             トップへ戻る
           </Link>
-          <h1 className="mt-4 text-3xl font-bold">
-            プライバシーポリシー
-          </h1>
+          <h1 className="mt-4 text-3xl font-bold">プライバシーポリシー</h1>
           <p className="mt-2 text-sm text-slate-500">
             最終更新日: 2026年4月23日
           </p>
@@ -29,7 +27,8 @@ export default function PrivacyPage() {
             </h2>
             <p className="mt-2">
               本サービスは、Google 認証を利用する際に、Google
-              アカウントに紐づく識別子、メールアドレス、表示名、プロフィール画像など、認証のために Google
+              アカウントに紐づく識別子、メールアドレス、表示名、プロフィール画像など、認証のために
+              Google
               から提供される情報を取得する場合があります。また、利用者が録音またはアップロードした音声データ、操作履歴、通信に伴う技術情報を取得する場合があります。
             </p>
           </section>
@@ -48,7 +47,8 @@ export default function PrivacyPage() {
               3. Google 認証について
             </h2>
             <p className="mt-2">
-              本サービスでは、ログイン手段として Google 認証を使用します。認証処理は Google
+              本サービスでは、ログイン手段として Google
+              認証を使用します。認証処理は Google
               の認証画面を通じて行われ、利用者は認証に使用する Google
               アカウントを選択できます。本サービスは、Google
               から提供された情報を本ポリシーに記載した目的の範囲で取り扱います。

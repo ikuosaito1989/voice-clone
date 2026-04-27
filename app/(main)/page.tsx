@@ -18,17 +18,16 @@ export default async function Home() {
             neglegere
           </h1>
           <p className="mt-4 text-base leading-7 text-slate-700">
-            neglegere は、ブラウザで録音した参照音声と入力した文章を使って、音声クローンの生成リクエストを作成し、生成された音声を確認・ダウンロードするためのアプリです。
+            neglegere
+            は、ブラウザで録音した参照音声と入力した文章を使って、音声クローンの生成リクエストを作成し、生成された音声を確認・ダウンロードするためのアプリです。
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Google アカウントでログインすると、認証済みユーザーとして音声生成機能を利用できます。
+            Google
+            アカウントでログインすると、認証済みユーザーとして音声生成機能を利用できます。
           </p>
         </section>
         <section className="w-full max-w-xl rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <AuthActions
-            email={session?.user.email}
-            userId={session?.user.id}
-          />
+          <AuthActions email={session?.user.email} userId={session?.user.id} />
         </section>
         <VoiceCloneForm turnstileSiteKey={turnstileSiteKey} />
         <nav className="flex gap-4 text-sm text-slate-600">

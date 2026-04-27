@@ -22,11 +22,10 @@ export default function TermsPage() {
 
         <div className="space-y-6 text-sm leading-7 text-slate-700">
           <section>
-            <h2 className="text-lg font-semibold text-slate-950">
-              第1条 適用
-            </h2>
+            <h2 className="text-lg font-semibold text-slate-950">第1条 適用</h2>
             <p className="mt-2">
-              本規約は、neglegere が提供する音声クローン生成および関連機能の利用条件を定めるものです。利用者は、本サービスを利用することで本規約に同意したものとみなされます。
+              本規約は、neglegere
+              が提供する音声クローン生成および関連機能の利用条件を定めるものです。利用者は、本サービスを利用することで本規約に同意したものとみなされます。
             </p>
           </section>
 
@@ -35,7 +34,8 @@ export default function TermsPage() {
               第2条 Google 認証
             </h2>
             <p className="mt-2">
-              本サービスでは、利用者の認証のために Google アカウントによるログイン機能を使用します。利用者は、Google
+              本サービスでは、利用者の認証のために Google
+              アカウントによるログイン機能を使用します。利用者は、Google
               の認証画面で認証に使用するアカウントを選択し、本サービスが認証に必要な情報を受け取ることに同意するものとします。
             </p>
           </section>
